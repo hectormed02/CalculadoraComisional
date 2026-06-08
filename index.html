@@ -325,7 +325,7 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
           <div class="ni"><span class="pfx">Q</span><input type="number" id="q_noporta" value="0" min="0" oninput="recalc()"></div>
         </div>
         <div class="ir">
-          <div class="il" style="color:rgba(255,255,255,.88);font-weight:500">Total Q de linéas</div>
+          <div class="il" style="color:rgba(255,255,255,.88);font-weight:500">Total Q de Móviles</div>
           <div class="dv" id="d_equiv">0</div>
         </div>
         <div class="ir">
@@ -403,20 +403,10 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
       <div class="rv" id="r_com_fija">S/.0</div>
       <div class="rc" id="rc_fija">— × 1.2</div>
     </div>
-    <div class="ri neu">
-      <div class="rl">Sueldo Básico</div>
-      <div class="rv" id="r_basico">S/.0</div>
-      <div class="rc" id="rc_basico">Fijo mensual</div>
-    </div>
-    <div class="ri neu">
-      <div class="rl">Movilidad</div>
-      <div class="rv" id="r_movilidad">S/.0</div>
-      <div class="rc" id="rc_movilidad">—</div>
-    </div>
     <div class="ri sum">
       <div class="rl">Total Comisiones</div>
       <div class="rv" id="r_total_com">S/.0</div>
-      <div class="rc">Mov + GPON + FIJA</div>
+      <div class="rc">Móvil + GPON + FIJA</div>
     </div>
   </div>
 
@@ -485,7 +475,7 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
   <!-- TOTAL BANNER -->
   <div class="total ain" style="animation-delay:.28s">
     <div class="total-l">
-      <h2>Ingreso Total Estimado</h2>
+      <h2>Total Comisión + Bonos</h2>
       <div class="pname" id="total-pname">Ejecutivo Comercial</div>
     </div>
     <div class="total-r">
@@ -506,10 +496,10 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
       <div class="rv" id="r_total_bonos">S/.0</div>
       <div class="rc">Móvil + GPON + FIJA</div>
     </div>
-    <div class="ri neu" style="background:rgba(255,255,255,.05)">
-      <div class="rl">Básico + Movilidad</div>
-      <div class="rv" id="r_basico_movil">S/.0</div>
-      <div class="rc" id="rc_basico_movil">—</div>
+    <div class="ri sum" style="background:rgba(5,150,105,.15)">
+      <div class="rl">Comisión + Bonos</div>
+      <div class="rv" id="r_gran_total" style="font-size:22px;color:#34D399">S/.0</div>
+      <div class="rc">Sin sueldo básico</div>
     </div>
   </div>
 
@@ -1020,14 +1010,6 @@ function recalc() {
   el('rc_gpon').textContent  = `${fmt(accGpon)} × ${factor > 0 ? '1.0' : '0.5 (factor inactivo)'}`;
   el('rc_fija').textContent  = `${fmt(accFijaDbi)} × 1.2`;
 
-  // ── Básico y movilidad ────────────────────────────────
-  setTxt('r_basico',    fmt(p.basico));
-  setTxt('r_movilidad', fmt(p.movilidad));
-  el('rc_basico').textContent = 'Sueldo fijo mensual';
-  el('rc_movilidad').textContent = p.movilidadNote;
-  setTxt('r_basico_movil', fmt(p.basico + p.movilidad));
-  el('rc_basico_movil').textContent = `S/.${p.basico.toLocaleString()} + S/.${p.movilidad.toLocaleString()}`;
-
   // ── Requisito FIJA ────────────────────────────────────
   const reqEl  = el('req-fija');
   const reqPct = Math.min(100, Math.round(fijaBono / 220 * 100));
@@ -1074,8 +1056,9 @@ function recalc() {
   el('rc_bono_fija').textContent  = bonoMovil > 0 ? `${fmt(fijaBono)} × ${pctLabel}` : 'Requiere Bono Móvil';
 
   // ── TOTAL ─────────────────────────────────────────────
-  const total = totalCom + totalBonos + p.basico + p.movilidad;
+  const total = totalCom + totalBonos;
   setTxt('r_total', fmtN(total));
+  setTxt('r_gran_total', fmt(total));
 }
 
 // ═══════════════════════════════════════════════════════
