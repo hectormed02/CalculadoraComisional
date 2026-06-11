@@ -259,6 +259,37 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
 .ain{animation:fadeUp .38s ease forwards}
 @keyframes flash{0%{opacity:1}50%{opacity:.5}100%{opacity:1}}
 .flash{animation:flash .35s ease}
+/* ── PRINT: pantalla negra para proteger información ── */
+@media print {
+  html, body {
+    background: #000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    height: 100vh;
+    overflow: hidden;
+  }
+  body::before { display: none !important; }
+  body * {
+    visibility: hidden !important;
+  }
+  body::after {
+    content: '🔒 Información confidencial — impresión deshabilitada';
+    visibility: visible !important;
+    position: fixed;
+    inset: 0;
+    background: #000 !important;
+    color: #000 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: sans-serif;
+    font-size: 10px;
+    z-index: 99999;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
 </style>
 </head>
 <body>
@@ -325,7 +356,7 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
           <div class="ni"><span class="pfx">Q</span><input type="number" id="q_noporta" value="0" min="0" oninput="recalc()"></div>
         </div>
         <div class="ir">
-          <div class="il" style="color:rgba(255,255,255,.88);font-weight:500">Total Q de Móviles</div>
+          <div class="il" style="color:rgba(255,255,255,.88);font-weight:500">Total Móviles Equivalentes</div>
           <div class="dv" id="d_equiv">0</div>
         </div>
         <div class="ir">
@@ -373,6 +404,70 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
       </div>
     </div>
   </div><!-- /cgrid -->
+
+  <!-- MIX DE PLANES VENDIDOS -->
+  <div class="card ain" style="animation-delay:.14s;margin-bottom:16px">
+    <div class="ch">
+      <div class="ci" style="background:rgba(109,46,70,.45)">📋</div>
+      <h3>Mix de Planes Vendidos</h3>
+      <span class="sub">Ingresa cuántas líneas vendiste de cada plan</span>
+    </div>
+    <div class="cb">
+      <div class="ir" style="border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:12px;margin-bottom:4px">
+        <div class="il" style="color:rgba(255,255,255,.88);font-weight:500">% Descuento aplicado a todos los planes</div>
+        <div class="ni" style="width:auto">
+          <select id="mix_descuento" onchange="recalcMix()" style="background:transparent;border:none;outline:none;color:var(--gold);font-family:var(--fm);font-size:13.5px;font-weight:500;height:36px;padding:0 10px;cursor:pointer">
+            <option value="0.50">50%</option>
+            <option value="0.45">45%</option>
+            <option value="0.40">40%</option>
+            <option value="0.35">35%</option>
+            <option value="0.30">30%</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="sim-wrap" style="margin:0 -2px">
+        <table class="sim-table" style="min-width:0">
+          <thead><tr>
+            <th style="text-align:left">Plan</th>
+            <th>RB Teorica</th>
+            <th>Cant Lineas</th>
+            <th>Access Real / linea</th>
+            <th>Equivalencia</th>
+            <th>Subtotal Equiv</th>
+            <th>Subtotal Access</th>
+          </tr></thead>
+          <tbody id="mix-plan-body"></tbody>
+        </table>
+      </div>
+
+      <div class="rgrid" style="margin-top:14px;border-radius:var(--rs);overflow:hidden">
+        <div class="ri">
+          <div class="rl">Total Lineas</div>
+          <div class="rv" id="mix_total_lineas" style="color:#93C5FD">0</div>
+          <div class="rc">Suma de todas las cantidades</div>
+        </div>
+        <div class="ri bono">
+          <div class="rl">Total Equivalente (Bono)</div>
+          <div class="rv" id="mix_total_equiv">0</div>
+          <div class="rc">Suma de Q x Equivalencia</div>
+        </div>
+        <div class="ri sum">
+          <div class="rl">Total Access Real</div>
+          <div class="rv" id="mix_total_access">S/.0</div>
+          <div class="rc">Suma de Access Real por linea</div>
+        </div>
+      </div>
+
+      <button onclick="aplicarMix()" style="margin-top:12px;width:100%;padding:12px;border:none;border-radius:var(--rs);background:linear-gradient(135deg,var(--blue2),var(--cyan));color:#fff;font-family:var(--fd);font-weight:700;font-size:13px;cursor:pointer;letter-spacing:.4px;transition:opacity .2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+        Aplicar a Calculadora (Total Equivalente + Access Real)
+      </button>
+      <div class="alert alert-b" style="margin-top:10px;font-size:11px">
+        <span class="aico">i</span>
+        <span>El Total Equivalente se usa para el Bono de Moviles. El Total Access Real alimenta la Facturacion Real. Al aplicar, se sobrescriben los campos de la calculadora.</span>
+      </div>
+    </div>
+  </div>
 
   <!-- FACTOR BAR -->
   <div class="fbar ain" style="animation-delay:.16s">
@@ -647,7 +742,37 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
     </div>
 
   </div>
-</div><!-- /pane-tablas -->
+
+  <!-- TABLA DE PLANES -->
+  <div class="card" style="margin-top:14px">
+    <div class="ch"><div class="ci" style="background:rgba(109,46,70,.5)">📱</div>
+      <h3>Tabla de Planes — Access Real &amp; Equivalencia por % Descuento</h3>
+      <span class="sub">RB Teórica (inc. IGV) → Access Real / Factor</span></div>
+    <div class="sim-wrap"><table class="sim-table" style="min-width:760px">
+      <thead><tr>
+        <th style="text-align:center">Plan (inc.IGV)</th>
+        <th colspan="2" style="text-align:center">Desc. 50%</th>
+        <th colspan="2" style="text-align:center">Desc. 45%</th>
+        <th colspan="2" style="text-align:center">Desc. 40%</th>
+        <th colspan="2" style="text-align:center">Desc. 35%</th>
+        <th colspan="2" style="text-align:center">Desc. 30%</th>
+      </tr>
+      <tr style="font-size:9px">
+        <th></th>
+        <th>Access</th><th>Factor</th>
+        <th>Access</th><th>Factor</th>
+        <th>Access</th><th>Factor</th>
+        <th>Access</th><th>Factor</th>
+        <th>Access</th><th>Factor</th>
+      </tr></thead>
+      <tbody id="plan-table-body"></tbody>
+    </table></div>
+    <div class="rcard-foot" style="border-top:1px solid rgba(255,255,255,.06)">
+      Access Real = Plan × (1 − Descuento) ÷ 1.18 (sin IGV). El Factor/Equivalencia se obtiene de la tabla de Equivalencias Móvil
+      según Access Real y el número de líneas del cliente (1–29 ó 30+).
+      Útil para estimar el <strong>Access Real</strong> de tus líneas y elegir el plan que maximiza la equivalencia para el Bono de Estructura.
+    </div>
+  </div>
 
 
 <!-- ══════════════════════════════════════════════════ -->
@@ -1138,7 +1263,122 @@ function buildSim(pid) {
 // ═══════════════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+//  MIX DE PLANES VENDIDOS
+// ═══════════════════════════════════════════════════════
+function buildMixTable() {
+  const tbody = el('mix-plan-body');
+  tbody.innerHTML = '';
+  PLANES.forEach((plan, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="text-align:left"><span class="qpill" style="background:#6D2E46">Plan ${i+1}</span></td>
+      <td>S/.${plan.toFixed(2)}</td>
+      <td style="text-align:center">
+        <input type="number" id="mix_q_${i}" value="0" min="0" oninput="recalcMix()"
+          style="width:64px;height:30px;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.12);
+          border-radius:6px;color:var(--gold);font-family:var(--fm);font-size:12.5px;text-align:center;outline:none">
+      </td>
+      <td class="g" id="mix_acc_${i}">0</td>
+      <td class="fac" id="mix_fac_${i}">0.00</td>
+      <td class="g" id="mix_seq_${i}">0</td>
+      <td class="g" id="mix_sacc_${i}">S/.0</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function recalcMix() {
+  const desc = parseFloat(el('mix_descuento').value);
+  let totalLineas = 0, totalEquiv = 0, totalAccess = 0;
+
+  PLANES.forEach((plan, i) => {
+    const q = parseFloat(el(`mix_q_${i}`).value) || 0;
+    const accessReal = (plan * (1 - desc)) / 1.18;
+    const factor = getEquivalencia(accessReal);
+    const subEquiv = q * factor;
+    const subAccess = q * accessReal;
+
+    el(`mix_acc_${i}`).textContent = fmt(accessReal);
+    el(`mix_fac_${i}`).textContent = factor.toFixed(2);
+    el(`mix_seq_${i}`).textContent = subEquiv.toFixed(2);
+    el(`mix_sacc_${i}`).textContent = fmt(subAccess);
+
+    totalLineas += q;
+    totalEquiv  += subEquiv;
+    totalAccess += subAccess;
+  });
+
+  setTxt('mix_total_lineas', totalLineas);
+  setTxt('mix_total_equiv', totalEquiv.toFixed(2));
+  setTxt('mix_total_access', fmt(totalAccess));
+}
+
+function aplicarMix() {
+  const desc = parseFloat(el('mix_descuento').value);
+  let totalEquiv = 0, totalAccess = 0;
+
+  PLANES.forEach((plan, i) => {
+    const q = parseFloat(el(`mix_q_${i}`).value) || 0;
+    const accessReal = (plan * (1 - desc)) / 1.18;
+    const factor = getEquivalencia(accessReal);
+    totalEquiv  += q * factor;
+    totalAccess += q * accessReal;
+  });
+
+  // Aplicar al total equivalente como "Móviles VOZ PORTA" y poner Pack NO PORTA en 0
+  el('q_porta').value   = Math.round(totalEquiv * 100) / 100;
+  el('q_noporta').value = 0;
+  el('access_movil').value = Math.round(totalAccess);
+
+  recalc();
+
+  // feedback visual
+  const btn = event.target;
+  const original = btn.textContent;
+  btn.textContent = '✅ Valores aplicados';
+  btn.style.background = 'linear-gradient(135deg, var(--green), #34D399)';
+  setTimeout(() => {
+    btn.textContent = original;
+    btn.style.background = 'linear-gradient(135deg, var(--blue2), var(--cyan))';
+  }, 1400);
+}
+
+
+const PLANES = [31.90, 33.90, 42.90, 44.90, 59.90, 69.90, 74.90, 79.90, 85.90, 99.90, 105.90, 159.90];
+const DESCUENTOS = [0.50, 0.45, 0.40, 0.35, 0.30];
+
+// Equivalencia (factor) según Access Real, para clientes 1-29 líneas (la más usada)
+function getEquivalencia(accessReal) {
+  if (accessReal < 18)    return 0.00;
+  if (accessReal < 24)    return 0.75;
+  if (accessReal < 29)    return 1.00;
+  if (accessReal < 42)    return 1.25;
+  if (accessReal < 65)    return 1.50;
+  return 1.80;
+}
+
+function buildPlanTable() {
+  const tbody = el('plan-table-body');
+  tbody.innerHTML = '';
+  PLANES.forEach(plan => {
+    const tr = document.createElement('tr');
+    let cells = `<td><span class="qpill" style="background:#6D2E46">S/.${plan.toFixed(2)}</span></td>`;
+    DESCUENTOS.forEach(d => {
+      const accessReal = (plan * (1 - d)) / 1.18;
+      const factor = getEquivalencia(accessReal);
+      cells += `<td class="g">${fmt(accessReal)}</td><td class="fac">${factor.toFixed(2)}</td>`;
+    });
+    tr.innerHTML = cells;
+    tbody.appendChild(tr);
+  });
+}
+
+buildMixTable();
+recalcMix();
+buildPlanTable();
 buildSim('C'); buildSim('S'); buildSim('K');
+
+
 el('total-pname').textContent = PERFILES[perfil].nombre;
 recalc();
 </script>
