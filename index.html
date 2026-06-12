@@ -1376,5 +1376,29 @@ buildSim('C'); buildSim('S'); buildSim('K');
 el('total-pname').textContent = PERFILES[perfil].nombre;
 recalc();
 </script>
+<!-- PRIVACY OVERLAY -->
+<div id="privacy-overlay" style="position:fixed;inset:0;background:#000;z-index:999999;
+  display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px">
+  <div style="font-size:32px">🔒</div>
+  <div style="color:rgba(255,255,255,.4);font-family:'DM Sans',sans-serif;font-size:13px">
+    Información protegida
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  PROTECCIÓN ANTE CAMBIO DE FOCO / VISIBILIDAD
+//  (best-effort: cubre la pantalla cuando la pestaña pierde
+//   foco. No existe API estándar para bloquear screenshots
+//   del sistema operativo, esto cubre cambios de ventana/app.)
+// ═══════════════════════════════════════════════════════
+const privacyOverlay = document.getElementById('privacy-overlay');
+window.addEventListener('blur', () => privacyOverlay.style.display = 'flex');
+window.addEventListener('focus', () => privacyOverlay.style.display = 'none');
+document.addEventListener('visibilitychange', () => {
+  privacyOverlay.style.display = document.hidden ? 'flex' : 'none';
+});
+</script>
+
 </body>
 </html>
