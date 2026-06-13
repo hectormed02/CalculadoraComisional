@@ -3,1402 +3,503 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Calculadora de Comisiones – Entel Empresas Feb 2026</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Calculadora de Comisiones – Mobilenet Solutions SRL</title>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --navy:#0A1E5E;--navy2:#132880;--blue:#1A4FBA;--blue2:#2563EB;
-  --cyan:#06B6D4;--gold:#F59E0B;--gold2:#FEF3C7;--gold3:#92400E;
-  --green:#059669;--green2:#DCFCE7;--red:#DC2626;--orange:#EA580C;
-  --slate:#64748B;--white:#FFFFFF;--dark:#0F172A;
-  --fd:'Syne',sans-serif;--fb:'DM Sans',sans-serif;--fm:'DM Mono',monospace;
-  --r:12px;--rs:8px;
-}
-html{scroll-behavior:smooth}
-body{font-family:var(--fb);background:#050E2E;color:var(--dark);min-height:100vh;overflow-x:hidden}
-body::before{
-  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
-  background:
-    radial-gradient(ellipse 80% 50% at 15% 0%,rgba(26,79,186,.38) 0%,transparent 70%),
-    radial-gradient(ellipse 55% 45% at 92% 85%,rgba(6,182,212,.2) 0%,transparent 60%),
-    radial-gradient(ellipse 40% 55% at 55% 50%,rgba(245,158,11,.05) 0%,transparent 70%),
-    #050E2E;
-}
-::-webkit-scrollbar{width:6px;height:6px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:99px}
-
-/* ── WRAP ── */
-.wrap{position:relative;z-index:1;max-width:1120px;margin:0 auto;padding:28px 18px 72px}
-
-/* ── HEADER ── */
-.hdr{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:32px;flex-wrap:wrap}
-.brand{display:flex;align-items:center;gap:14px}
-.logo{width:50px;height:50px;border-radius:13px;background:linear-gradient(135deg,var(--blue2),var(--cyan));
-  display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;
-  font-size:20px;color:#fff;box-shadow:0 4px 18px rgba(37,99,235,.45)}
-.brand-txt h1{font-family:var(--fd);font-size:21px;font-weight:800;color:#fff;letter-spacing:-.4px;line-height:1.1}
-.brand-txt p{font-size:12.5px;color:rgba(255,255,255,.45);margin-top:2px}
-.badge{background:rgba(245,158,11,.14);border:1px solid rgba(245,158,11,.35);color:var(--gold);
-  font-family:var(--fd);font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;
-  padding:6px 14px;border-radius:99px}
-
-/* ── PERFIL TABS ── */
-.perfil-tabs{display:flex;gap:6px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);
-  padding:5px;border-radius:var(--r);margin-bottom:24px;flex-wrap:wrap}
-.ptab{flex:1;min-width:148px;padding:11px 16px;border:none;border-radius:var(--rs);
-  background:transparent;color:rgba(255,255,255,.45);font-family:var(--fd);font-weight:700;
-  font-size:13px;cursor:pointer;position:relative;overflow:hidden;transition:color .2s}
-.ptab span{position:relative;z-index:1}
-.ptab::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .22s;border-radius:var(--rs)}
-.ptab[data-p="C"]::before{background:linear-gradient(135deg,#1A4FBA,#3B82F6)}
-.ptab[data-p="S"]::before{background:linear-gradient(135deg,#B45309,#F59E0B)}
-.ptab[data-p="K"]::before{background:linear-gradient(135deg,#059669,#34D399)}
-.ptab.on{color:#fff;box-shadow:0 4px 16px rgba(0,0,0,.28)}
-.ptab.on::before{opacity:1}
-.ptab:hover:not(.on){color:rgba(255,255,255,.75);background:rgba(255,255,255,.07)}
-
-/* ── SECTION TABS ── */
-.stabs{display:flex;gap:2px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:22px;flex-wrap:wrap}
-.stab{padding:9px 18px;border:none;background:transparent;color:rgba(255,255,255,.38);
-  font-family:var(--fd);font-size:12.5px;font-weight:700;cursor:pointer;
-  border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .18s;letter-spacing:.3px}
-.stab.on{color:var(--gold);border-bottom-color:var(--gold)}
-.stab:hover:not(.on){color:rgba(255,255,255,.7)}
-.pane{display:none}.pane.on{display:block}
-
-/* ── CARDS ── */
-.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
-  border-radius:var(--r);overflow:hidden;transition:border-color .2s}
-.card:hover{border-color:rgba(255,255,255,.14)}
-.ch{padding:13px 18px 11px;display:flex;align-items:center;gap:10px;
-  border-bottom:1px solid rgba(255,255,255,.07)}
-.ci{width:31px;height:31px;border-radius:8px;display:flex;align-items:center;
-  justify-content:center;font-size:14px;flex-shrink:0}
-.ch h3{font-family:var(--fd);font-size:12px;font-weight:700;color:rgba(255,255,255,.88);
-  text-transform:uppercase;letter-spacing:.4px}
-.ch .sub{margin-left:auto;font-size:10.5px;color:rgba(255,255,255,.3)}
-.cb{padding:14px 18px 18px}
-
-/* ── INPUT ROWS ── */
-.ir{display:flex;align-items:center;justify-content:space-between;gap:12px;
-  padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05)}
-.ir:last-child{border-bottom:none}
-.il{font-size:12.5px;color:rgba(255,255,255,.6);flex:1;line-height:1.35}
-.il small{display:block;font-size:10px;color:rgba(255,255,255,.28);margin-top:2px;font-style:italic}
-.ni{display:flex;align-items:center;background:rgba(255,255,255,.055);
-  border:1.5px solid rgba(255,255,255,.11);border-radius:8px;overflow:hidden;
-  transition:border-color .18s,box-shadow .18s;flex-shrink:0}
-.ni:focus-within{border-color:var(--gold);box-shadow:0 0 0 3px rgba(245,158,11,.14)}
-.ni .pfx{padding:0 8px;font-size:11px;color:rgba(255,255,255,.3);font-family:var(--fm);
-  border-right:1px solid rgba(255,255,255,.08);height:36px;display:flex;align-items:center;user-select:none}
-.ni input{width:88px;height:36px;padding:0 10px;background:transparent;border:none;outline:none;
-  color:var(--gold);font-family:var(--fm);font-size:13.5px;font-weight:500;text-align:right}
-.ni input::placeholder{color:rgba(255,255,255,.18)}
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
-.dv{font-family:var(--fm);font-size:13px;font-weight:500;color:rgba(255,255,255,.65);
-  min-width:96px;text-align:right;background:rgba(255,255,255,.04);
-  border:1.5px solid rgba(255,255,255,.07);border-radius:8px;height:36px;
-  padding:0 11px;display:flex;align-items:center;justify-content:flex-end}
-
-/* ── GRID ── */
-.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-@media(max-width:700px){.cgrid{grid-template-columns:1fr}}
-
-/* ── FACTOR BAR ── */
-.fbar{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
-  border-radius:var(--r);padding:14px 20px;margin-bottom:16px;
-  display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-.fbar-label{font-family:var(--fd);font-size:11px;font-weight:700;color:rgba(255,255,255,.38);
-  text-transform:uppercase;letter-spacing:.5px}
-.fbar-val{font-family:var(--fm);font-size:14px;color:#93C5FD;font-weight:500}
-.fbar-arrow{color:rgba(255,255,255,.25);font-size:14px}
-.factor-pill{background:rgba(37,99,235,.2);border:1px solid rgba(37,99,235,.4);
-  color:#60A5FA;font-family:var(--fm);font-size:22px;font-weight:600;
-  padding:4px 18px;border-radius:99px;min-width:80px;text-align:center;
-  transition:all .3s}
-.factor-pill.active{background:rgba(5,150,105,.2);border-color:rgba(5,150,105,.45);color:#4ADE80}
-
-/* ── RESULTS GRID ── */
-.rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
-  background:rgba(255,255,255,.06);border-radius:var(--r);overflow:hidden;margin-bottom:16px}
-@media(max-width:580px){.rgrid{grid-template-columns:1fr 1fr}}
-.ri{background:#050E2E;padding:15px 18px;transition:background .18s}
-.ri:hover{background:rgba(255,255,255,.03)}
-.ri .rl{font-size:10.5px;color:rgba(255,255,255,.38);font-weight:500;
-  text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
-.ri .rv{font-family:var(--fm);font-size:19px;font-weight:500;color:#4ADE80;line-height:1;
-  transition:color .3s}
-.ri .rc{font-size:10px;color:rgba(255,255,255,.22);margin-top:4px;font-style:italic}
-.ri.bono .rv{color:#FCD34D}
-.ri.neu  .rv{color:rgba(255,255,255,.55)}
-.ri.sum  {background:rgba(5,150,105,.07)}
-.ri.sum .rv{color:#34D399;font-size:21px}
-.ri.bonos-sum{background:rgba(245,158,11,.07)}
-.ri.bonos-sum .rv{color:#FCD34D;font-size:21px}
-
-/* ── DESGLOSE BONOS ── */
-.bono-section{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
-  border-radius:var(--r);overflow:hidden;margin-bottom:16px}
-.bono-hdr{padding:12px 18px;background:rgba(245,158,11,.1);border-bottom:1px solid rgba(245,158,11,.18);
-  display:flex;align-items:center;gap:10px}
-.bono-hdr h3{font-family:var(--fd);font-size:12px;font-weight:700;color:rgba(255,255,255,.88);
-  text-transform:uppercase;letter-spacing:.4px}
-.bono-hdr .req-tag{margin-left:auto;font-size:10px;padding:3px 10px;border-radius:99px}
-.bono-body{padding:14px 18px}
-
-/* Bono progress bars */
-.bono-block{margin-bottom:16px}
-.bono-block:last-child{margin-bottom:0}
-.bono-block-title{font-size:11px;font-weight:600;color:rgba(255,255,255,.5);
-  text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;
-  display:flex;align-items:center;gap:8px}
-.bono-tiers{display:flex;flex-direction:column;gap:4px}
-.bono-tier{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:6px;
-  border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);
-  transition:all .2s;position:relative;overflow:hidden}
-.bono-tier::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
-.bono-tier.achieved::before{background:var(--green)}
-.bono-tier.next::before{background:var(--gold)}
-.bono-tier.locked::before{background:rgba(255,255,255,.12)}
-.bono-tier.achieved{background:rgba(5,150,105,.08);border-color:rgba(5,150,105,.2)}
-.bono-tier.next{background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.2)}
-.bono-tier-q{font-family:var(--fm);font-size:12px;color:rgba(255,255,255,.5);min-width:80px}
-.bono-tier-bar{flex:1;height:5px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden}
-.bono-tier-fill{height:100%;border-radius:99px;transition:width .5s ease}
-.bono-tier.achieved .bono-tier-fill{background:var(--green)}
-.bono-tier.next .bono-tier-fill{background:var(--gold)}
-.bono-tier.locked .bono-tier-fill{background:rgba(255,255,255,.12);width:0!important}
-.bono-tier-val{font-family:var(--fm);font-size:13px;font-weight:600;min-width:70px;text-align:right}
-.bono-tier.achieved .bono-tier-val{color:#4ADE80}
-.bono-tier.next .bono-tier-val{color:var(--gold)}
-.bono-tier.locked .bono-tier-val{color:rgba(255,255,255,.25)}
-.bono-tier-icon{font-size:12px;width:16px;text-align:center}
-
-/* ── TOTAL BANNER ── */
-.total{background:linear-gradient(135deg,var(--navy2) 0%,#0D2A7E 100%);
-  border:1px solid rgba(255,255,255,.12);border-radius:var(--r);
-  padding:22px 28px;display:flex;align-items:center;justify-content:space-between;
-  flex-wrap:wrap;gap:18px;margin-bottom:16px;position:relative;overflow:hidden}
-.total::before{content:'';position:absolute;right:-40px;top:-40px;width:200px;height:200px;
-  border-radius:50%;background:radial-gradient(circle,rgba(245,158,11,.1),transparent 70%)}
-.total-l h2{font-family:var(--fd);font-size:11px;font-weight:700;color:rgba(255,255,255,.4);
-  text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
-.total-l .pname{font-family:var(--fd);font-size:18px;font-weight:800;color:#fff}
-.total-r .lbl{font-size:11px;color:rgba(255,255,255,.38);text-transform:uppercase;
-  letter-spacing:.5px;font-weight:500;margin-bottom:4px;text-align:right}
-.total-r .amt{font-family:var(--fd);font-size:46px;font-weight:800;color:var(--gold);
-  line-height:1;letter-spacing:-2px;text-align:right}
-.total-r .amt .cur{font-size:22px;font-weight:600;letter-spacing:-1px;
-  vertical-align:top;margin-top:6px;display:inline-block}
-
-/* ── ALERT ── */
-.alert{padding:10px 14px;border-radius:var(--rs);font-size:12px;
-  display:flex;align-items:flex-start;gap:9px;margin-top:12px;line-height:1.5}
-.alert-w{background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.28);color:#FCA5A5}
-.alert-g{background:rgba(5,150,105,.1);border:1px solid rgba(5,150,105,.28);color:#6EE7B7}
-.alert-b{background:rgba(37,99,235,.09);border:1px solid rgba(37,99,235,.22);color:#93C5FD}
-.alert-y{background:rgba(245,158,11,.09);border:1px solid rgba(245,158,11,.22);color:#FDE68A}
-.aico{font-size:14px;flex-shrink:0;margin-top:1px}
-
-/* ── REQUISITO FIJA BANNER ── */
-.req-fija{border-radius:var(--rs);padding:11px 16px;font-size:12px;
-  display:flex;align-items:center;gap:12px;margin-bottom:16px;
-  transition:all .4s}
-.req-fija.fail{background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.3);color:#FCA5A5}
-.req-fija.pass{background:rgba(5,150,105,.1);border:1px solid rgba(5,150,105,.3);color:#6EE7B7}
-.req-fija .rfi{font-size:16px;flex-shrink:0}
-.req-fija .rfm{flex:1}
-.req-fija .rfm strong{display:block;font-weight:600;margin-bottom:2px}
-.req-prog{height:5px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden;margin-top:6px}
-.req-prog-fill{height:100%;border-radius:99px;transition:width .5s,background .4s}
-
-/* ── TABLAS REF ── */
-.ref-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;margin-bottom:16px}
-.rcard{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(--rs);overflow:hidden}
-.rcard-h{padding:9px 13px;font-family:var(--fd);font-size:10.5px;font-weight:700;
-  color:#fff;text-transform:uppercase;letter-spacing:.5px}
-.rtable{width:100%;border-collapse:collapse;font-size:11.5px}
-.rtable td{padding:6px 13px;border-top:1px solid rgba(255,255,255,.045);
-  color:rgba(255,255,255,.65);font-family:var(--fm)}
-.rtable tr:nth-child(odd) td{background:rgba(255,255,255,.02)}
-.rtable td:last-child{text-align:right;font-weight:600;color:#60A5FA}
-.rtable td.g{color:#4ADE80}.rtable td.go{color:#FCD34D}
-.rcard-foot{padding:8px 13px;font-size:9.5px;color:rgba(255,255,255,.3);
-  line-height:1.5;border-top:1px solid rgba(255,255,255,.045)}
-
-/* ── SIM TABLE ── */
-.sim-wrap{overflow-x:auto;border-radius:var(--rs);margin-bottom:14px}
-.sim-table{width:100%;border-collapse:collapse;font-size:11.5px;min-width:680px}
-.sim-table thead th{padding:9px 12px;background:var(--navy);color:rgba(255,255,255,.65);
-  font-family:var(--fd);font-size:9.5px;text-transform:uppercase;letter-spacing:.4px;
-  font-weight:700;text-align:right;white-space:nowrap}
-.sim-table thead th:first-child{text-align:center}
-.sim-table tbody td{padding:8px 12px;border-top:1px solid rgba(255,255,255,.045);
-  color:rgba(255,255,255,.7);font-family:var(--fm);text-align:right}
-.sim-table tbody tr:nth-child(odd){background:rgba(255,255,255,.018)}
-.sim-table tbody tr:hover{background:rgba(37,99,235,.08)}
-.sim-table tbody td:first-child{text-align:center;font-family:var(--fd);font-weight:700;font-size:13px;color:#fff}
-.sim-table tbody td.g{color:#4ADE80}
-.sim-table tbody td.go{color:var(--gold);font-weight:700;font-size:12.5px}
-.sim-table tbody td.fac{color:#60A5FA;font-weight:600}
-.qpill{background:var(--blue);color:#fff;border-radius:99px;padding:2px 9px;font-size:11.5px;display:inline-block}
-
-/* ── REGLAS ── */
-.rules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(275px,1fr));gap:11px}
-.rule{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
-  border-left:3px solid;border-radius:var(--rs);padding:11px 14px}
-.rule strong{font-family:var(--fd);font-size:11.5px;font-weight:700;color:rgba(255,255,255,.88);
-  display:block;margin-bottom:4px}
-.rule p{font-size:11.5px;color:rgba(255,255,255,.5);line-height:1.55}
-
-/* ── ANIMATE ── */
-@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-.ain{animation:fadeUp .38s ease forwards}
-@keyframes flash{0%{opacity:1}50%{opacity:.5}100%{opacity:1}}
-.flash{animation:flash .35s ease}
-/* ── PRINT: pantalla negra total para proteger información ── */
-@media print {
-  html, body {
-    background: #000 !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-    color-adjust: exact !important;
-    height: 100vh;
-    overflow: hidden;
+  :root {
+    --teal: #0097A7; --teal-dk: #00788A; --teal-lt: #E0F5F7;
+    --navy: #1A2340; --navy-lt: #E8EBF4;
+    --white: #FFF; --g50: #F5F6FA; --g100: #ECEEF5; --g300: #C4CAD9; --g500: #6B7491; --g700: #2E3651;
+    --green: #00897B; --green-lt: #E0F2F1; --amber: #F59E0B; --amber-lt: #FEF3CD; --red: #D32F2F; --red-lt: #FFEBEE;
   }
-  body::before { display: none !important; }
-  body * {
-    visibility: hidden !important;
-  }
-  body::after {
-    content: '';
-    visibility: visible !important;
-    position: fixed;
-    inset: 0;
-    background: #000 !important;
-    z-index: 99999;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--g50);color:var(--g700);min-height:100vh;}
+  * { -webkit-user-select:none; -moz-user-select:none; user-select:none; }
+  input,select { -webkit-user-select:text; -moz-user-select:text; user-select:text; }
+  @media print { body *{display:none!important;} body::after{content:'DOCUMENTO PROTEGIDO';display:block;font-size:24px;padding:100px;text-align:center;color:var(--red);} }
+  header{background:var(--navy);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,32,91,.25);}
+  .logo{display:flex;align-items:center;gap:12px;}
+  .logo-mark{width:40px;height:40px;background:var(--teal);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:white;letter-spacing:.5px;}
+  .logo-text{color:white;font-size:15px;font-weight:600;}
+  .logo-sub{color:rgba(255,255,255,.55);font-size:11px;letter-spacing:1px;text-transform:uppercase;}
+  .hdr-r{display:flex;align-items:center;gap:14px;}
+  .hdr-r .dot{width:8px;height:8px;border-radius:50%;background:#4DD0E1;animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+  .hdr-r span{color:rgba(255,255,255,.5);font-size:11px;letter-spacing:.5px;text-transform:uppercase;}
+  .main{max-width:1100px;margin:0 auto;padding:32px 24px 60px;}
+  .section-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--g500);margin-bottom:12px;}
+  .role-section{margin-bottom:28px;} .role-section select{max-width:500px;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;}
+  @media(max-width:720px){.grid{grid-template-columns:1fr;}header{padding:0 16px;}.main{padding:20px 16px 60px;}}
+  .card{background:var(--white);border-radius:16px;border:1.5px solid var(--g100);overflow:hidden;}
+  .card-header{padding:16px 20px 14px;border-bottom:1px solid var(--g100);display:flex;align-items:center;gap:10px;}
+  .card-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+  .icon-movil{background:#EEF1F8;} .icon-gpon{background:#E6F7EE;} .icon-fija{background:#FDE8F3;}
+  .card-title{font-size:14px;font-weight:700;color:var(--navy);}
+  .card-body{padding:20px;}
+  .field{margin-bottom:16px;} .field:last-child{margin-bottom:0;}
+  label{display:block;font-size:12px;font-weight:600;color:var(--g500);margin-bottom:6px;letter-spacing:.3px;}
+  input[type="number"]{width:100%;padding:10px 14px;border:1.5px solid var(--g300);border-radius:8px;font-size:14px;font-weight:500;color:var(--navy);background:var(--white);transition:border-color .15s;-moz-appearance:textfield;}
+  input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none;}
+  input[type="number"]:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,151,167,.1);}
+  .input-prefix{position:relative;} .input-prefix span{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:13px;font-weight:600;color:var(--g500);pointer-events:none;} .input-prefix input{padding-left:32px;}
+  select{width:100%;padding:10px 14px;border:1.5px solid var(--g300);border-radius:8px;font-size:14px;font-weight:500;color:var(--navy);background:var(--white);cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237A8299' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;}
+  select:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,151,167,.1);}
+  .factor-display{display:flex;align-items:center;justify-content:space-between;background:var(--navy-lt);border-radius:8px;padding:10px 14px;margin-top:10px;}
+  .factor-label{font-size:11px;font-weight:600;color:var(--g500);letter-spacing:.5px;text-transform:uppercase;}
+  .factor-value{font-size:22px;font-weight:800;color:var(--navy);letter-spacing:-.5px;}
+  .factor-range{font-size:10px;color:var(--g500);margin-top:1px;text-align:right;}
+  .tramo-row{display:flex;align-items:center;gap:8px;border-radius:7px;padding:7px 10px;background:var(--g50);border:1.5px solid transparent;transition:all .2s;position:relative;overflow:hidden;margin-bottom:4px;}
+  .tramo-row.activo{background:var(--navy);border-color:var(--teal);box-shadow:0 2px 10px rgba(0,151,167,.2);}
+  .tramo-factor{font-size:16px;font-weight:900;min-width:34px;color:var(--g300);letter-spacing:-.5px;}
+  .tramo-row.activo .tramo-factor{color:var(--teal);}
+  .tramo-rango{font-size:11px;color:var(--g500);flex:1;}
+  .tramo-row.activo .tramo-rango{color:rgba(255,255,255,.65);}
+  .tramo-bar{height:4px;border-radius:2px;background:var(--g300);position:absolute;bottom:0;left:0;transition:width .35s ease;}
+  .tramo-row.activo .tramo-bar{background:var(--teal);}
+  .tramo-badge-activo{background:var(--teal);color:white;font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px;letter-spacing:.5px;text-transform:uppercase;flex-shrink:0;}
+  .tramo-falta{font-size:10px;color:rgba(255,255,255,.45);flex-shrink:0;}
+  .alert{border-radius:8px;padding:10px 14px;font-size:12px;font-weight:500;display:flex;gap:8px;align-items:flex-start;margin-top:12px;}
+  .alert-warn{background:var(--amber-lt);color:#92400E;border:1px solid #FCD34D;}
+  .alert-ok{background:var(--green-lt);color:#065F46;border:1px solid #6EE7B7;}
+  .alert-err{background:var(--red-lt);color:var(--red);border:1px solid #FCA5A5;}
+  .bonus-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px dashed var(--g100);font-size:13px;}
+  .bonus-row:last-child{border-bottom:none;} .bonus-row.active{font-weight:700;color:var(--teal);}
+  .bonus-row .b-label{color:var(--g500);} .bonus-row.active .b-label{color:var(--teal);}
+  .results-panel{background:var(--navy);border-radius:16px;overflow:hidden;grid-column:1/-1;}
+  .results-header{background:var(--teal);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;}
+  .results-header h2{color:white;font-size:15px;font-weight:700;}
+  .results-role-badge{background:rgba(255,255,255,.2);color:white;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase;}
+  .results-body{padding:24px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+  @media(max-width:720px){.results-body{grid-template-columns:1fr 1fr;}}
+  .result-item{background:rgba(255,255,255,.07);border-radius:12px;padding:14px 16px;border:1px solid rgba(255,255,255,.08);}
+  .result-item-label{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:6px;}
+  .result-item-value{font-size:20px;font-weight:800;color:white;letter-spacing:-.5px;}
+  .result-item-value.highlight{color:#FFD700;}
+  .result-item-sub{font-size:10px;color:rgba(255,255,255,.35);margin-top:3px;}
+  .total-section{border-top:1px solid rgba(255,255,255,.1);margin:0 24px;padding:20px 0 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+  .total-label{font-size:13px;font-weight:600;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:1px;}
+  .total-value{font-size:42px;font-weight:900;color:white;letter-spacing:-2px;line-height:1;}
+  .total-value span{color:var(--teal);font-size:24px;vertical-align:super;letter-spacing:0;}
+  .bono-scale{background:rgba(255,255,255,.05);border-radius:8px;padding:12px 16px;margin:0 24px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .bono-scale-label{font-size:11px;color:rgba(255,255,255,.5);font-weight:600;letter-spacing:.5px;text-transform:uppercase;flex-shrink:0;}
+  .scale-bars{display:flex;gap:6px;flex:1;align-items:center;}
+  .scale-bar{flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,.12);}
+  .scale-bar.active{background:var(--teal);}
+  .scale-pct{font-size:13px;font-weight:800;color:white;flex-shrink:0;}
+  .divider{border:none;border-top:1.5px solid var(--g100);margin:12px 0;}
+  footer{background:var(--navy);border-top:1px solid rgba(255,255,255,.06);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+  /* LOADING & BLOCKED SCREENS */
+  #loadScreen,#blockedScreen{position:fixed;top:0;left:0;width:100%;height:100%;z-index:10000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;}
+  #loadScreen{background:var(--navy);}
+  #blockedScreen{background:#1a1a2e;display:none;}
+  .loader{width:40px;height:40px;border:4px solid rgba(255,255,255,.1);border-top-color:var(--teal);border-radius:50%;animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .load-text{color:rgba(255,255,255,.6);font-size:13px;letter-spacing:.5px;}
+  .blocked-icon{font-size:48px;margin-bottom:8px;}
+  .blocked-title{color:var(--red);font-size:20px;font-weight:800;}
+  .blocked-sub{color:var(--g500);font-size:13px;text-align:center;max-width:360px;line-height:1.5;}
+  #appContent{display:none;}
 </style>
 </head>
 <body>
-<div class="wrap">
 
-<!-- HEADER -->
-<header class="hdr ain">
-  <div class="brand">
-    <div class="logo">e)</div>
-    <div class="brand-txt">
-      <h1>Entel Empresas</h1>
-      <p>Calculadora de Comisiones · FFVV Convergente</p>
+<!-- LOADING -->
+<div id="loadScreen">
+  <div class="loader"></div>
+  <div class="load-text">Conectando con base de datos...</div>
+</div>
+
+<!-- BLOCKED -->
+<div id="blockedScreen">
+  <div class="blocked-icon">🔒</div>
+  <div class="blocked-title">ACCESO NO AUTORIZADO</div>
+  <div class="blocked-sub">Tu dirección IP no tiene permiso para acceder a esta herramienta. Contacta al administrador.</div>
+  <div style="color:var(--g500);font-size:11px;margin-top:16px;" id="blockedIP"></div>
+</div>
+
+<!-- APP -->
+<div id="appContent">
+<header>
+  <div class="logo">
+    <div class="logo-mark">MS</div>
+    <div>
+      <div class="logo-text">Mobilenet Solutions <span style="font-weight:400;opacity:.7;">SRL</span></div>
+      <div class="logo-sub">Gestión Comercial · Fuerza de Ventas</div>
     </div>
   </div>
-  <span class="badge">Febrero 2026</span>
+  <div class="hdr-r">
+    <div class="dot"></div>
+    <span>En vivo desde Google Sheets</span>
+  </div>
 </header>
 
-<!-- PERFIL TABS -->
-<div class="perfil-tabs ain" style="animation-delay:.07s">
-  <button class="ptab on" data-p="C" onclick="setPerfil(this)"><span>📊 Ejecutivo Comercial</span></button>
-  <button class="ptab"    data-p="S" onclick="setPerfil(this)"><span>⭐ Ejecutivo Senior</span></button>
-  <button class="ptab"    data-p="K" onclick="setPerfil(this)"><span>🏆 Ejecutivo KAM</span></button>
-</div>
-
-<!-- SECTION TABS -->
-<div class="stabs">
-  <button class="stab on"  onclick="showPane('calc',this)">🧮 Calculadora</button>
-  <button class="stab"     onclick="showPane('tablas',this)">📊 Tablas</button>
-  <button class="stab"     onclick="showPane('sim',this)">📈 Simulaciones</button>
-  <button class="stab"     onclick="showPane('reglas',this)">📋 Reglas</button>
-</div>
-
-<!-- ══════════════════════════════════════════════════ -->
-<!--  CALCULADORA                                       -->
-<!-- ══════════════════════════════════════════════════ -->
-<div id="pane-calc" class="pane on">
-
-  <!-- Requisito FIJA -->
-  <div class="req-fija fail ain" id="req-fija" style="animation-delay:.1s">
-    <span class="rfi" id="req-ico">⚠️</span>
-    <div class="rfm">
-      <strong id="req-msg">Access FIJA menor a S/.220 — Bono Móvil NO aplica. Faltan S/.220 para habilitarlo.</strong>
-      <div class="req-prog"><div class="req-prog-fill" id="req-bar" style="width:0%;background:var(--red)"></div></div>
-    </div>
-    <span id="req-pct" style="font-family:var(--fm);font-size:13px;font-weight:600;color:rgba(255,255,255,.4)">0%</span>
+<div class="main">
+  <div class="role-section">
+    <div class="section-label">Seleccionar Rol</div>
+    <select id="roleSelect" onchange="setRole(this.value)"></select>
   </div>
 
-  <!-- INPUTS GRID -->
-  <div class="cgrid ain" style="animation-delay:.12s">
-
-    <!-- MÓVILES -->
+  <div class="grid">
     <div class="card">
-      <div class="ch">
-        <div class="ci" style="background:rgba(37,99,235,.22)">📱</div>
-        <h3>Móviles</h3>
+      <div class="card-header"><div class="card-icon icon-movil">📱</div><div><div class="card-title">Móviles</div></div></div>
+      <div class="card-body">
+        <div class="field"><label>Cantidad de líneas móviles PORTA VOZ</label><input type="number" id="qMoviles" min="0" value="0" oninput="recalc()"></div>
+        <div class="field"><label>Access Móvil (sin IGV)</label><div class="input-prefix"><span>S/.</span><input type="number" id="accessMovil" min="0" value="0" step="0.01" oninput="recalc()"></div></div>
+        <div class="field"><label>Tipo de venta móvil</label><select id="tipoMovil" onchange="recalc()"><option value="porta">PORTA (factor normal)</option><option value="noPortaPack">No PORTA PACK (×0.7)</option><option value="chipNoPack">CHIP NO PORTA / BAM (factor 0.5, no suma)</option></select></div>
+        <hr class="divider">
+        <div class="factor-display"><div><div class="factor-label">Factor Facturación MOV+GPON</div><div class="factor-range" id="factorRange">—</div></div><div class="factor-value" id="factorMovilVal">0.0</div></div>
+        <div style="margin-top:14px;"><div class="factor-label" style="margin-bottom:8px;">Tramo actual</div><div id="factorEscala"></div></div>
+        <div id="alertMovil"></div>
+        <div style="margin-top:16px;"><div class="section-label" style="margin-bottom:8px;">Bono por cantidad de móviles</div><div id="bonoMovilTable"></div></div>
       </div>
-      <div class="cb">
-        <div class="ir">
-          <div class="il">Móviles VOZ PORTA<small>Líneas portadas a Entel</small></div>
-          <div class="ni"><span class="pfx">Q</span><input type="number" id="q_porta" value="0" min="0" oninput="recalc()"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:20px;">
+      <div class="card">
+        <div class="card-header"><div class="card-icon icon-gpon">🌐</div><div><div class="card-title">GPON – Fibra Óptica</div></div></div>
+        <div class="card-body">
+          <div class="field"><label>Access GPON total (sin IGV)</label><div class="input-prefix"><span>S/.</span><input type="number" id="accessGpon" min="0" value="0" step="0.01" oninput="recalc()"></div></div>
+          <div class="field"><label>¿GPON con facturación activa?</label><select id="gponFactura" onchange="recalc()"><option value="si">Sí — factor 1.0</option><option value="no">No — factor 0.5</option></select></div>
+          <div id="alertGpon"></div>
         </div>
-        <div class="ir">
-          <div class="il">Pack NO PORTA VOZ<small>Multiplicar por equivalencia del plan</small></div>
-          <div class="ni"><span class="pfx">Q</span><input type="number" id="q_noporta" value="0" min="0" oninput="recalc()"></div>
-        </div>
-        <div class="ir">
-          <div class="il" style="color:rgba(255,255,255,.88);font-weight:500">Total Móviles Equivalentes</div>
-          <div class="dv" id="d_equiv">0</div>
-        </div>
-        <div class="ir">
-          <div class="il">Access Real Móvil (total)<small>Sin IGV, después de descuentos</small></div>
-          <div class="ni"><span class="pfx">S/.</span><input type="number" id="access_movil" value="0" min="0" step="10" oninput="recalc()"></div>
-        </div>
-        <div class="ir" id="row-noporta-factor" style="display:none">
-          <div class="il" style="color:#FCD34D">⚠ Ventas NO PORTA PACK<small>Factor adicional × 0.7 aplicado</small></div>
-          <div class="dv" id="d_noporta_fac" style="color:#FCD34D">×0.7</div>
-        </div>
-        <div class="alert alert-b" style="margin-top:10px;font-size:11px">
-          <span class="aico">ℹ️</span>
-          <span>Para Bono, solo cuentan <strong>VOZ PORTA</strong> y <strong>Pack NO PORTA VOZ</strong> según equivalencias.</span>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-icon icon-fija">🏢</div><div><div class="card-title">Fija / DBI</div></div></div>
+        <div class="card-body">
+          <div class="field"><label>Access Fija total (sin IGV)</label><div class="input-prefix"><span>S/.</span><input type="number" id="accessFija" min="0" value="0" step="0.01" oninput="recalc()"></div></div>
+          <div id="alertFija"></div>
         </div>
       </div>
     </div>
 
-    <!-- GPON / FIJA -->
-    <div class="card">
-      <div class="ch">
-        <div class="ci" style="background:rgba(6,182,212,.22)">🌐</div>
-        <h3>GPON / FIJA / DBI</h3>
+    <div class="results-panel">
+      <div class="results-header"><h2>Ingreso Total Estimado</h2><div class="results-role-badge" id="badgeRole">—</div></div>
+      <div class="results-body">
+        <div class="result-item"><div class="result-item-label">Com. Móvil</div><div class="result-item-value" id="rComMovil">S/. 0</div><div class="result-item-sub" id="rComMovilSub">—</div></div>
+        <div class="result-item"><div class="result-item-label">Com. GPON</div><div class="result-item-value" id="rComGpon">S/. 0</div><div class="result-item-sub" id="rComGponSub">—</div></div>
+        <div class="result-item"><div class="result-item-label">Com. Fija</div><div class="result-item-value" id="rComFija">S/. 0</div><div class="result-item-sub" id="rComFijaSub">—</div></div>
+        <div class="result-item"><div class="result-item-label">Sueldo Básico</div><div class="result-item-value" id="rBasico">S/. 0</div><div class="result-item-sub">Fijo mensual</div></div>
+        <div class="result-item"><div class="result-item-label">Bono Móviles</div><div class="result-item-value highlight" id="rBonoMovil">S/. 0</div><div class="result-item-sub" id="rBonoMovilSub">—</div></div>
+        <div class="result-item"><div class="result-item-label">Bono GPON</div><div class="result-item-value highlight" id="rBonoGpon">S/. 0</div><div class="result-item-sub" id="rBonoGponSub">—</div></div>
+        <div class="result-item"><div class="result-item-label">Bono Fija</div><div class="result-item-value highlight" id="rBonoFija">S/. 0</div><div class="result-item-sub" id="rBonoFijaSub">—</div></div>
+        <div class="result-item"><div class="result-item-label">Movilidad</div><div class="result-item-value" id="rMovilidad">S/. 0</div><div class="result-item-sub" id="rMovilidadSub">—</div></div>
       </div>
-      <div class="cb">
-        <div class="ir">
-          <div class="il">Access GPON Instalado (comisión)<small>RUC 20 y RUC 10 CN — para tabla de factor</small></div>
-          <div class="ni"><span class="pfx">S/.</span><input type="number" id="access_gpon" value="0" min="0" step="10" oninput="recalc()"></div>
-        </div>
-        <div class="ir">
-          <div class="il">GPON para Bono de Estructura<small>Puede ser el mismo u otro monto</small></div>
-          <div class="ni"><span class="pfx">S/.</span><input type="number" id="gpon_bono" value="0" min="0" step="10" oninput="recalc()"></div>
-        </div>
-        <div class="ir">
-          <div class="il">Access Contrato FIJA / DBI<small>Base comisión DBI: × 1.2</small></div>
-          <div class="ni"><span class="pfx">S/.</span><input type="number" id="access_fija_dbi" value="0" min="0" step="10" oninput="recalc()"></div>
-        </div>
-        <div class="ir">
-          <div class="il">FIJA para Bono de Estructura<small>⭐ Mín. S/.220 para activar Bono Móvil</small></div>
-          <div class="ni"><span class="pfx">S/.</span><input type="number" id="fija_bono" value="0" min="0" step="10" oninput="recalc()"></div>
-        </div>
-        <div class="ir">
-          <div class="il">Facturación MOV + GPON</div>
-          <div class="dv" id="d_facturacion" style="color:#93C5FD">S/.0</div>
-        </div>
-      </div>
-    </div>
-  </div><!-- /cgrid -->
-
-  <!-- MIX DE PLANES VENDIDOS -->
-  <div class="card ain" style="animation-delay:.14s;margin-bottom:16px">
-    <div class="ch">
-      <div class="ci" style="background:rgba(109,46,70,.45)">📋</div>
-      <h3>Mix de Planes Vendidos</h3>
-      <span class="sub">Ingresa cuántas líneas vendiste de cada plan</span>
-    </div>
-    <div class="cb">
-      <div class="ir" style="border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:12px;margin-bottom:4px">
-        <div class="il" style="color:rgba(255,255,255,.88);font-weight:500">% Descuento aplicado a todos los planes</div>
-        <div class="ni" style="width:auto">
-          <select id="mix_descuento" onchange="recalcMix()" style="background:transparent;border:none;outline:none;color:var(--gold);font-family:var(--fm);font-size:13.5px;font-weight:500;height:36px;padding:0 10px;cursor:pointer">
-            <option value="0.50">50%</option>
-            <option value="0.45">45%</option>
-            <option value="0.40">40%</option>
-            <option value="0.35">35%</option>
-            <option value="0.30">30%</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="sim-wrap" style="margin:0 -2px">
-        <table class="sim-table" style="min-width:0">
-          <thead><tr>
-            <th style="text-align:left">Plan</th>
-            <th>RB Teorica</th>
-            <th>Cant Lineas</th>
-            <th>Access Real / linea</th>
-            <th>Equivalencia</th>
-            <th>Subtotal Equiv</th>
-            <th>Subtotal Access</th>
-          </tr></thead>
-          <tbody id="mix-plan-body"></tbody>
-        </table>
-      </div>
-
-      <div class="rgrid" style="margin-top:14px;border-radius:var(--rs);overflow:hidden">
-        <div class="ri">
-          <div class="rl">Total Lineas</div>
-          <div class="rv" id="mix_total_lineas" style="color:#93C5FD">0</div>
-          <div class="rc">Suma de todas las cantidades</div>
-        </div>
-        <div class="ri bono">
-          <div class="rl">Total Equivalente (Bono)</div>
-          <div class="rv" id="mix_total_equiv">0</div>
-          <div class="rc">Suma de Q x Equivalencia</div>
-        </div>
-        <div class="ri sum">
-          <div class="rl">Total Access Real</div>
-          <div class="rv" id="mix_total_access">S/.0</div>
-          <div class="rc">Suma de Access Real por linea</div>
-        </div>
-      </div>
-
-      <button onclick="aplicarMix()" style="margin-top:12px;width:100%;padding:12px;border:none;border-radius:var(--rs);background:linear-gradient(135deg,var(--blue2),var(--cyan));color:#fff;font-family:var(--fd);font-weight:700;font-size:13px;cursor:pointer;letter-spacing:.4px;transition:opacity .2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-        Aplicar a Calculadora (Total Equivalente + Access Real)
-      </button>
-      <div class="alert alert-b" style="margin-top:10px;font-size:11px">
-        <span class="aico">i</span>
-        <span>El Total Equivalente se usa para el Bono de Moviles. El Total Access Real alimenta la Facturacion Real. Al aplicar, se sobrescriben los campos de la calculadora.</span>
-      </div>
+      <div class="bono-scale"><div class="bono-scale-label">% Bono (Fija) →</div><div class="scale-bars"><div class="scale-bar" id="sbar1"></div><div class="scale-bar" id="sbar2"></div><div class="scale-bar" id="sbar3"></div></div><div class="scale-pct" id="scalePct">—</div></div>
+      <div class="total-section"><div><div class="total-label">Ingreso Total Estimado</div></div><div class="total-value" id="rTotal"><span>S/.</span>0</div></div>
     </div>
   </div>
-
-  <!-- FACTOR BAR -->
-  <div class="fbar ain" style="animation-delay:.16s">
-    <span class="fbar-label">Facturación Real</span>
-    <span class="fbar-val" id="fb_facturacion">S/.0</span>
-    <span class="fbar-arrow">→</span>
-    <span class="fbar-label">Factor</span>
-    <span class="factor-pill" id="fb_factor">0.0×</span>
-    <span class="fbar-arrow" style="margin-left:12px">→</span>
-    <span class="fbar-label">Rango objetivo</span>
-    <span class="fbar-val" id="fb_siguiente" style="color:var(--gold)">—</span>
+</div>
+<footer>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div style="width:24px;height:24px;background:var(--teal);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:white;">MS</div>
+    <span style="color:rgba(255,255,255,.35);font-size:11px;">Mobilenet Solutions SRL · Datos en vivo desde Google Sheets</span>
   </div>
-
-  <!-- COMISIONES RESULTS -->
-  <div class="rgrid ain" style="animation-delay:.2s">
-    <div class="ri">
-      <div class="rl">Com. Móvil</div>
-      <div class="rv" id="r_com_movil">S/.0</div>
-      <div class="rc" id="rc_movil">— × —</div>
-    </div>
-    <div class="ri">
-      <div class="rl">Com. GPON</div>
-      <div class="rv" id="r_com_gpon">S/.0</div>
-      <div class="rc" id="rc_gpon">— × 1.0</div>
-    </div>
-    <div class="ri">
-      <div class="rl">Com. FIJA / DBI</div>
-      <div class="rv" id="r_com_fija">S/.0</div>
-      <div class="rc" id="rc_fija">— × 1.2</div>
-    </div>
-    <div class="ri sum">
-      <div class="rl">Total Comisiones</div>
-      <div class="rv" id="r_total_com">S/.0</div>
-      <div class="rc">Móvil + GPON + FIJA</div>
-    </div>
-  </div>
-
-  <!-- BONOS DESGLOSE -->
-  <div class="bono-section ain" style="animation-delay:.24s">
-    <div class="bono-hdr">
-      <span style="font-size:16px">🎁</span>
-      <h3>Bonos de Estructura</h3>
-      <span class="req-tag alert-g" id="bono-req-tag" style="display:none;font-size:10px;padding:3px 10px;border-radius:99px">✅ Requisito FIJA cumplido</span>
-      <span class="req-tag alert-w" id="bono-req-fail" style="font-size:10px;padding:3px 10px;border-radius:99px">⚠ Requiere S/.220+ FIJA</span>
-    </div>
-    <div class="bono-body">
-
-      <!-- Bono Móviles -->
-      <div class="bono-block">
-        <div class="bono-block-title">
-          📱 Bono Móviles
-          <span style="color:rgba(255,255,255,.3);font-weight:400;font-size:10px" id="bono-mov-ganado"></span>
-        </div>
-        <div class="bono-tiers" id="bono-tiers-movil"></div>
-      </div>
-
-      <!-- Bono GPON -->
-      <div class="bono-block" style="margin-top:14px">
-        <div class="bono-block-title">
-          🌐 Bono GPON
-          <span style="color:rgba(255,255,255,.3);font-weight:400;font-size:10px" id="bono-gpon-ganado"></span>
-        </div>
-        <div class="bono-tiers" id="bono-tiers-gpon"></div>
-        <div class="alert alert-y" style="margin-top:8px;font-size:11px">
-          <span class="aico">📅</span>
-          <span id="bono-gpon-pct-msg">Escala Feb 2026: el % del bono GPON/FIJA depende del access GPON.</span>
-        </div>
-      </div>
-
-      <!-- Bono FIJA -->
-      <div class="bono-block" style="margin-top:14px">
-        <div class="bono-block-title">
-          🏢 Bono FIJA
-          <span style="color:rgba(255,255,255,.3);font-weight:400;font-size:10px" id="bono-fija-ganado"></span>
-        </div>
-        <div class="bono-tiers" id="bono-tiers-fija"></div>
-      </div>
-
-      <!-- Subtotales bonos -->
-      <div class="rgrid" style="margin-top:14px;border-radius:var(--rs);overflow:hidden">
-        <div class="ri bono">
-          <div class="rl">Bono Móviles</div>
-          <div class="rv" id="r_bono_movil">S/.0</div>
-          <div class="rc" id="rc_bono_movil">—</div>
-        </div>
-        <div class="ri bono">
-          <div class="rl">Bono GPON</div>
-          <div class="rv" id="r_bono_gpon">S/.0</div>
-          <div class="rc" id="rc_bono_gpon">—</div>
-        </div>
-        <div class="ri bonos-sum">
-          <div class="rl">Bono FIJA <span style="font-size:9px;opacity:.5">(Feb 2026)</span></div>
-          <div class="rv" id="r_bono_fija">S/.0</div>
-          <div class="rc" id="rc_bono_fija">—</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- TOTAL BANNER -->
-  <div class="total ain" style="animation-delay:.28s">
-    <div class="total-l">
-      <h2>Total Comisión + Bonos</h2>
-      <div class="pname" id="total-pname">Ejecutivo Comercial</div>
-    </div>
-    <div class="total-r">
-      <div class="lbl">Este mes</div>
-      <div class="amt"><span class="cur">S/.</span><span id="r_total">0</span></div>
-    </div>
-  </div>
-
-  <!-- RESUMEN TOTALES -->
-  <div class="rgrid ain" style="animation-delay:.3s">
-    <div class="ri sum">
-      <div class="rl">Total Comisiones</div>
-      <div class="rv" id="r_total_com2">S/.0</div>
-      <div class="rc">Móvil + GPON + FIJA</div>
-    </div>
-    <div class="ri bonos-sum">
-      <div class="rl">Total Bonos</div>
-      <div class="rv" id="r_total_bonos">S/.0</div>
-      <div class="rc">Móvil + GPON + FIJA</div>
-    </div>
-    <div class="ri sum" style="background:rgba(5,150,105,.15)">
-      <div class="rl">Comisión + Bonos</div>
-      <div class="rv" id="r_gran_total" style="font-size:22px;color:#34D399">S/.0</div>
-      <div class="rc">Sin sueldo básico</div>
-    </div>
-  </div>
-
-</div><!-- /pane-calc -->
-
-
-<!-- ══════════════════════════════════════════════════ -->
-<!--  TABLAS DE REFERENCIA                              -->
-<!-- ══════════════════════════════════════════════════ -->
-<div id="pane-tablas" class="pane">
-  <div class="ref-grid">
-
-    <div class="rcard">
-      <div class="rcard-h" style="background:rgba(26,79,186,.45)">Factor – Ejecutivo Comercial</div>
-      <table class="rtable">
-        <tr><td>S/0 – S/.599</td><td>0</td></tr>
-        <tr><td>S/.600 – S/.749</td><td>0.6</td></tr>
-        <tr><td>S/.750 – S/.899</td><td>0.8</td></tr>
-        <tr><td>S/.900 – S/.1,099</td><td>1.0</td></tr>
-        <tr><td>S/.1,100 – S/.1,299</td><td class="g">1.4</td></tr>
-        <tr><td>S/.1,300+</td><td class="g">1.7</td></tr>
-      </table>
-    </div>
-
-    <div class="rcard">
-      <div class="rcard-h" style="background:rgba(180,83,9,.5)">Factor – Ejecutivo Senior</div>
-      <table class="rtable">
-        <tr><td>S/0 – S/.799</td><td>0</td></tr>
-        <tr><td>S/.800 – S/.999</td><td>0.6</td></tr>
-        <tr><td>S/.1,000 – S/.1,199</td><td>0.8</td></tr>
-        <tr><td>S/.1,200 – S/.1,399</td><td>1.0</td></tr>
-        <tr><td>S/.1,400 – S/.1,699</td><td class="g">1.5</td></tr>
-        <tr><td>S/.1,700+</td><td class="g">1.9</td></tr>
-      </table>
-    </div>
-
-    <div class="rcard">
-      <div class="rcard-h" style="background:rgba(5,150,105,.45)">Factor – Ejecutivo KAM</div>
-      <table class="rtable">
-        <tr><td>S/0 – S/.999</td><td>0</td></tr>
-        <tr><td>S/.1,000 – S/.1,199</td><td>0.6</td></tr>
-        <tr><td>S/.1,200 – S/.1,399</td><td>0.8</td></tr>
-        <tr><td>S/.1,400 – S/.1,799</td><td>1.0</td></tr>
-        <tr><td>S/.1,800 – S/.2,199</td><td class="g">1.6</td></tr>
-        <tr><td>S/.2,200+</td><td class="g">2.1</td></tr>
-      </table>
-    </div>
-
-    <div class="rcard">
-      <div class="rcard-h" style="background:rgba(26,79,186,.45)">Bono Móviles – Comercial</div>
-      <table class="rtable">
-        <tr><td>25 líneas</td><td class="go">S/.400</td></tr>
-        <tr><td>30 líneas</td><td class="go">S/.800</td></tr>
-        <tr><td>40 líneas</td><td class="go">S/.1,200</td></tr>
-        <tr><td>50 líneas</td><td class="go">S/.1,600</td></tr>
-        <tr><td>65 líneas</td><td class="go">S/.2,000</td></tr>
-        <tr><td>80 líneas</td><td class="go">S/.2,500</td></tr>
-        <tr><td>100 líneas</td><td class="go">S/.3,000</td></tr>
-      </table>
-    </div>
-
-    <div class="rcard">
-      <div class="rcard-h" style="background:rgba(180,83,9,.5)">Bono Móviles – Senior</div>
-      <table class="rtable">
-        <tr><td>40 líneas</td><td class="go">S/.1,000</td></tr>
-        <tr><td>50 líneas</td><td class="go">S/.1,800</td></tr>
-        <tr><td>65 líneas</td><td class="go">S/.2,300</td></tr>
-        <tr><td>80 líneas</td><td class="go">S/.2,900</td></tr>
-        <tr><td>100 líneas</td><td class="go">S/.3,500</td></tr>
-      </table>
-    </div>
-
-    <div class="rcard">
-      <div class="rcard-h" style="background:rgba(5,150,105,.45)">Bono Móviles – KAM</div>
-      <table class="rtable">
-        <tr><td>50 líneas</td><td class="go">S/.1,600</td></tr>
-        <tr><td>65 líneas</td><td class="go">S/.2,500</td></tr>
-        <tr><td>80 líneas</td><td class="go">S/.3,200</td></tr>
-        <tr><td>100 líneas</td><td class="go">S/.3,900</td></tr>
-        <tr><td>125 líneas</td><td class="go">S/.4,200</td></tr>
-        <tr><td>150 líneas</td><td class="go">S/.4,500</td></tr>
-      </table>
-    </div>
-
-    <div class="rcard">
-      <div class="rcard-h" style="background:rgba(6,182,212,.35)">Bono GPON (todos los perfiles)</div>
-      <table class="rtable">
-        <tr><td>≥ S/.220 access</td><td class="go">S/.200</td></tr>
-        <tr><td>≥ S/.320 access</td><td class="go">S/.300</td></tr>
-        <tr><td>≥ S/.420 access</td><td class="go">S/.400</td></tr>
-        <tr><td>≥ S/.520 access</td><td class="go">S/.500</td></tr>
-        <tr><td>≥ S/.620 access</td><td class="go">S/.600</td></tr>
-        <tr><td>≥ S/.720 access</td><td class="go">S/.700</td></tr>
-        <tr><td>≥ S/.820 access</td><td class="go">S/.800</td></tr>
-      </table>
-      <div class="rcard-foot">Solo aplica si se ganó Bono Móvil</div>
-    </div>
-
-    <div class="rcard">
-      <div class="rcard-h" style="background:rgba(180,83,9,.4)">Bono FIJA (todos los perfiles)</div>
-      <table class="rtable">
-        <tr><td>≥ S/.200 access</td><td class="go">S/.200</td></tr>
-        <tr><td>≥ S/.350 access</td><td class="go">S/.300</td></tr>
-        <tr><td>≥ S/.500 access</td><td class="go">S/.400</td></tr>
-        <tr><td>≥ S/.650 access</td><td class="go">S/.800</td></tr>
-        <tr><td>≥ S/.800 access</td><td class="go">S/.900</td></tr>
-        <tr><td>≥ S/.950 access</td><td class="go">S/.1,000</td></tr>
-        <tr><td>≥ S/.1,100 access</td><td class="go">S/.1,200</td></tr>
-      </table>
-      <div class="rcard-foot">Solo si se ganó Bono Móvil. El % final depende de escala Feb 2026.</div>
-    </div>
-
-    <div class="rcard">
-      <div class="rcard-h" style="background:rgba(220,38,38,.38)">Escala % Bono – Febrero 2026</div>
-      <table class="rtable">
-        <tr><td>GPON S/0 – S/.149.99</td><td style="color:#FCA5A5">25%</td></tr>
-        <tr><td>GPON S/.150 – S/.219.99</td><td style="color:#FCD34D">50%</td></tr>
-        <tr><td>GPON S/.220+</td><td class="g">100%</td></tr>
-      </table>
-      <div class="rcard-foot">Aplica para: GPON Extendido (RUC 20 y 10), Fibra+, DBI, DBA, Radio Enlace, Fibra, Central Telefónica Virtual</div>
-    </div>
-
-    <div class="rcard">
-      <div class="rcard-h" style="background:rgba(109,46,70,.6)">Equivalencias Móvil (1–29 líneas)</div>
-      <table class="rtable">
-        <tr><td>S/0 – S/.17.99</td><td>0.00</td></tr>
-        <tr><td>S/.18 – S/.23.99</td><td>0.75</td></tr>
-        <tr><td>S/.24 – S/.28.99</td><td>1.00</td></tr>
-        <tr><td>S/.29 – S/.41.99</td><td>1.25</td></tr>
-        <tr><td>S/.42 – S/.64.99</td><td>1.50</td></tr>
-        <tr><td>S/.65+</td><td>1.80</td></tr>
-      </table>
-    </div>
-
-    <div class="rcard">
-      <div class="rcard-h" style="background:rgba(109,46,70,.6)">Equivalencias Móvil (30+ líneas)</div>
-      <table class="rtable">
-        <tr><td>S/0 – S/.17.99</td><td>0.50</td></tr>
-        <tr><td>S/.18 – S/.23.99</td><td>0.75</td></tr>
-        <tr><td>S/.24 – S/.28.99</td><td>1.00</td></tr>
-        <tr><td>S/.29 – S/.41.99</td><td>1.25</td></tr>
-        <tr><td>S/.42 – S/.64.99</td><td>1.50</td></tr>
-        <tr><td>S/.65+</td><td>1.80</td></tr>
-      </table>
-    </div>
-
-  </div>
-
-  <!-- TABLA DE PLANES -->
-  <div class="card" style="margin-top:14px">
-    <div class="ch"><div class="ci" style="background:rgba(109,46,70,.5)">📱</div>
-      <h3>Tabla de Planes — Access Real &amp; Equivalencia por % Descuento</h3>
-      <span class="sub">RB Teórica (inc. IGV) → Access Real / Factor</span></div>
-    <div class="sim-wrap"><table class="sim-table" style="min-width:760px">
-      <thead><tr>
-        <th style="text-align:center">Plan (inc.IGV)</th>
-        <th colspan="2" style="text-align:center">Desc. 50%</th>
-        <th colspan="2" style="text-align:center">Desc. 45%</th>
-        <th colspan="2" style="text-align:center">Desc. 40%</th>
-        <th colspan="2" style="text-align:center">Desc. 35%</th>
-        <th colspan="2" style="text-align:center">Desc. 30%</th>
-      </tr>
-      <tr style="font-size:9px">
-        <th></th>
-        <th>Access</th><th>Factor</th>
-        <th>Access</th><th>Factor</th>
-        <th>Access</th><th>Factor</th>
-        <th>Access</th><th>Factor</th>
-        <th>Access</th><th>Factor</th>
-      </tr></thead>
-      <tbody id="plan-table-body"></tbody>
-    </table></div>
-    <div class="rcard-foot" style="border-top:1px solid rgba(255,255,255,.06)">
-      Access Real = Plan × (1 − Descuento) ÷ 1.18 (sin IGV). El Factor/Equivalencia se obtiene de la tabla de Equivalencias Móvil
-      según Access Real y el número de líneas del cliente (1–29 ó 30+).
-      Útil para estimar el <strong>Access Real</strong> de tus líneas y elegir el plan que maximiza la equivalencia para el Bono de Estructura.
-    </div>
-  </div>
-
-
-<!-- ══════════════════════════════════════════════════ -->
-<!--  SIMULACIONES                                      -->
-<!-- ══════════════════════════════════════════════════ -->
-<div id="pane-sim" class="pane">
-
-  <div class="card" style="margin-bottom:14px">
-    <div class="ch"><div class="ci" style="background:rgba(37,99,235,.3)">📊</div>
-      <h3>Ejecutivo Comercial</h3><span class="sub">Básico S/.1,130 · Mov. S/.175</span></div>
-    <div class="sim-wrap"><table class="sim-table">
-      <thead><tr><th>Q Móv.</th><th>Acc. Móvil</th><th>Acc. GPON</th><th>Acc. FIJA</th><th>Factor</th><th>Com. Móvil</th><th>Com. GPON</th><th>Com. FIJA</th><th>Bonos Total</th><th>INGRESO</th></tr></thead>
-      <tbody id="sim-C"></tbody>
-    </table></div>
-  </div>
-
-  <div class="card" style="margin-bottom:14px">
-    <div class="ch"><div class="ci" style="background:rgba(180,83,9,.35)">⭐</div>
-      <h3>Ejecutivo Senior</h3><span class="sub">Básico S/.1,500 · Mov. S/.200</span></div>
-    <div class="sim-wrap"><table class="sim-table">
-      <thead><tr><th>Q Móv.</th><th>Acc. Móvil</th><th>Acc. GPON</th><th>Acc. FIJA</th><th>Factor</th><th>Com. Móvil</th><th>Com. GPON</th><th>Com. FIJA</th><th>Bonos Total</th><th>INGRESO</th></tr></thead>
-      <tbody id="sim-S"></tbody>
-    </table></div>
-  </div>
-
-  <div class="card">
-    <div class="ch"><div class="ci" style="background:rgba(5,150,105,.35)">🏆</div>
-      <h3>Ejecutivo KAM</h3><span class="sub">Básico S/.1,800 · Mov. S/.200 (adelantado, sin reversión)</span></div>
-    <div class="sim-wrap"><table class="sim-table">
-      <thead><tr><th>Q Móv.</th><th>Acc. Móvil</th><th>Acc. GPON</th><th>Acc. FIJA</th><th>Factor</th><th>Com. Móvil</th><th>Com. GPON</th><th>Com. FIJA</th><th>Bonos Total</th><th>INGRESO</th></tr></thead>
-      <tbody id="sim-K"></tbody>
-    </table></div>
-  </div>
-
-</div><!-- /pane-sim -->
-
-
-<!-- ══════════════════════════════════════════════════ -->
-<!--  REGLAS                                            -->
-<!-- ══════════════════════════════════════════════════ -->
-<div id="pane-reglas" class="pane">
-  <div class="rules-grid">
-    <div class="rule" style="border-left-color:var(--cyan)">
-      <strong>GPON Extendido</strong>
-      <p>Comisión 100% al mes siguiente de la admisión, <em>solo si se instala antes del día 25</em> del mes siguiente. Debe estar INSTALADO para sumar a facturación real. Suman RUC 20 y RUC 10 CN.</p>
-    </div>
-    <div class="rule" style="border-left-color:var(--gold)">
-      <strong>Ventas Móviles – 1er recibo</strong>
-      <p>Ventas móviles que no hayan pagado el 1er recibo posterior a la venta <strong>no cuentan</strong> para cumplimiento de ventas ni se paga comisión.</p>
-    </div>
-    <div class="rule" style="border-left-color:var(--red)">
-      <strong>Reversión de Comisiones</strong>
-      <p>Contratos VOZ+BAM, FIJA y VAS que se desactiven antes del <strong>4to recibo → reversión 100%</strong>. Antes del <strong>7mo recibo → reversión 50%</strong>.</p>
-    </div>
-    <div class="rule" style="border-left-color:var(--blue2)">
-      <strong>Planes RB Teórica &lt; S/.44.90 inc. IGV</strong>
-      <p>Sí cuentan para la tabla de factor de facturación real y cobran comisión, pero <strong>NO suman al Bono de Estructura</strong>.</p>
-    </div>
-    <div class="rule" style="border-left-color:var(--slate)">
-      <strong>CHIP NO PORTA y BAM</strong>
-      <p>No suman a facturación real ni al Bono de Estructura. Solo pagan comisión con <strong>factor 0.5</strong> siempre que se active el factor de facturación.</p>
-    </div>
-    <div class="rule" style="border-left-color:var(--orange)">
-      <strong>Ventas NO PORTA PACK</strong>
-      <p>Factor adicional <strong>× 0.7</strong>. Multiplicar por el factor de la tabla de facturación real. Cuentan para tabla pero con penalidad.</p>
-    </div>
-    <div class="rule" style="border-left-color:var(--green)">
-      <strong>Requisito Bono Móvil (Feb 2026)</strong>
-      <p>Se requiere access mínimo de <strong>S/.220 sin IGV</strong> de cualquier producto de FIJA para activar el Bono Móvil. El Bono FIJA solo se gana si se cumple el objetivo de móviles.</p>
-    </div>
-    <div class="rule" style="border-left-color:var(--cyan)">
-      <strong>Escala Bono GPON/FIJA – Feb 2026</strong>
-      <p>Según el access GPON sin IGV: <strong>S/0–S/.149</strong> → 25% del bono base · <strong>S/.150–S/.219</strong> → 50% · <strong>S/.220+</strong> → 100%.</p>
-    </div>
-    <div class="rule" style="border-left-color:var(--blue2)">
-      <strong>DBI – Calendario de pago</strong>
-      <p>DBI, DBA, Radio Enlace, Fibra, Cloud, TI y CT: <strong>50% al mes siguiente de la admisión</strong> y <strong>50% al mes siguiente de la instalación</strong>. Factor 1.2.</p>
-    </div>
-    <div class="rule" style="border-left-color:var(--gold)">
-      <strong>VAS (Senior y KAM)</strong>
-      <p>Factor <strong>1.0</strong> si se activa la tabla de facturación real. Factor <strong>0.5</strong> si no se activa la tabla.</p>
-    </div>
-    <div class="rule" style="border-left-color:var(--green)">
-      <strong>KAM – Movilidad garantizada</strong>
-      <p>Para el Ejecutivo KAM la movilidad se paga <strong>por adelantado</strong> todos los meses y <strong>no está sujeta a reversión</strong>.</p>
-    </div>
-    <div class="rule" style="border-left-color:var(--blue2)">
-      <strong>Bono GPON – requisito lineal móvil</strong>
-      <p>El Bono GPON y el Bono FIJA solo se ganan si se <strong>cumple al menos el primer objetivo lineal de móviles</strong> del perfil correspondiente.</p>
-    </div>
-  </div>
-</div><!-- /pane-reglas -->
-
-<footer style="text-align:center;margin-top:40px;padding-top:20px;
-  border-top:1px solid rgba(255,255,255,.06);font-size:11px;color:rgba(255,255,255,.22);font-family:var(--fb)">
-  Entel Empresas · Calculadora FFVV Convergente · Febrero 2026 · Confidencial – Solo para uso interno
+  <span style="color:rgba(255,255,255,.2);font-size:10px;letter-spacing:.5px;">CONFIDENCIAL</span>
 </footer>
-
-</div><!-- /wrap -->
-
-<script>
-// ═══════════════════════════════════════════════════════
-//  DATOS DE NEGOCIO
-// ═══════════════════════════════════════════════════════
-const PERFILES = {
-  C: { nombre: 'Ejecutivo Comercial', basico: 1130, movilidad: 175, movilidadNote: 'Bono adicional' },
-  S: { nombre: 'Ejecutivo Senior',    basico: 1500, movilidad: 200, movilidadNote: 'Bono adicional' },
-  K: { nombre: 'Ejecutivo KAM',       basico: 1800, movilidad: 200, movilidadNote: 'Adelantado, sin reversión' }
-};
-
-// Tablas de factor [limite_inferior, factor]
-const FACTORES = {
-  C: [[0,0],[600,0.6],[750,0.8],[900,1.0],[1100,1.4],[1300,1.7]],
-  S: [[0,0],[800,0.6],[1000,0.8],[1200,1.0],[1400,1.5],[1700,1.9]],
-  K: [[0,0],[1000,0.6],[1200,0.8],[1400,1.0],[1800,1.6],[2200,2.1]]
-};
-
-// Tiers de bono móviles [minQ, bono]
-const BONO_MOVIL = {
-  C: [[25,400],[30,800],[40,1200],[50,1600],[65,2000],[80,2500],[100,3000]],
-  S: [[40,1000],[50,1800],[65,2300],[80,2900],[100,3500]],
-  K: [[50,1600],[65,2500],[80,3200],[100,3900],[125,4200],[150,4500]]
-};
-
-// Tiers bono GPON [minAccess, bono_base]
-const BONO_GPON_TIERS = [
-  [220,200],[320,300],[420,400],[520,500],[620,600],[720,700],[820,800]
-];
-
-// Tiers bono FIJA [minAccess, bono_base]
-const BONO_FIJA_TIERS = [
-  [200,200],[350,300],[500,400],[650,800],[800,900],[950,1000],[1100,1200]
-];
-
-// ═══════════════════════════════════════════════════════
-//  ESTADO
-// ═══════════════════════════════════════════════════════
-let perfil = 'C';
-
-// ═══════════════════════════════════════════════════════
-//  HELPERS
-// ═══════════════════════════════════════════════════════
-const v   = id => parseFloat(document.getElementById(id).value) || 0;
-const el  = id => document.getElementById(id);
-const fmt = n  => 'S/.' + Math.round(n).toLocaleString('es-PE');
-const fmtN= n  => Math.round(n).toLocaleString('es-PE');
-
-function setTxt(id, txt) {
-  const e = el(id); if (!e) return;
-  if (e.textContent !== String(txt)) {
-    e.textContent = txt;
-    e.classList.remove('flash');
-    void e.offsetWidth;
-    e.classList.add('flash');
-  }
-}
-
-function getFactor(fac, p) {
-  const tiers = FACTORES[p];
-  let factor = 0;
-  for (const [lim, f] of tiers) { if (fac >= lim) factor = f; }
-  return factor;
-}
-
-function getNextFactor(fac, p) {
-  const tiers = FACTORES[p];
-  for (let i = tiers.length - 1; i >= 0; i--) {
-    if (fac < tiers[i][0]) return { limite: tiers[i][0], factor: tiers[i][1] };
-  }
-  return null; // ya en el máximo
-}
-
-function getBonoMovilBase(q, p) {
-  const tiers = BONO_MOVIL[p];
-  let bono = 0;
-  for (const [minQ, b] of tiers) { if (q >= minQ) bono = b; }
-  return bono;
-}
-
-function getBonoGponBase(gpon) {
-  let bono = 0;
-  for (const [minA, b] of BONO_GPON_TIERS) { if (gpon >= minA) bono = b; }
-  return bono;
-}
-
-function getBonoFijaBase(fija) {
-  let bono = 0;
-  for (const [minA, b] of BONO_FIJA_TIERS) { if (fija >= minA) bono = b; }
-  return bono;
-}
-
-// Escala % bono Feb 2026 según access GPON
-function getPctBono(gpon) {
-  if (gpon < 150) return 0.25;
-  if (gpon < 220) return 0.50;
-  return 1.0;
-}
-
-// ═══════════════════════════════════════════════════════
-//  RENDER TIERS
-// ═══════════════════════════════════════════════════════
-function renderTiersMovil(q, fijaBono, p) {
-  const tiers = BONO_MOVIL[p];
-  const tieneRequisito = fijaBono >= 220;
-  const tbody = el('bono-tiers-movil');
-  tbody.innerHTML = '';
-
-  let ganado = 0;
-
-  tiers.forEach(([minQ, bono], i) => {
-    const achieved = tieneRequisito && q >= minQ;
-    const isNext   = tieneRequisito && q < minQ && (i === 0 || q >= tiers[i-1][0]);
-    const state    = achieved ? 'achieved' : isNext ? 'next' : 'locked';
-    if (achieved) ganado = bono;
-
-    // progreso dentro del tramo
-    let pct = 0;
-    if (achieved) { pct = 100; }
-    else if (isNext) {
-      const prevQ = i > 0 ? tiers[i-1][0] : 0;
-      pct = Math.min(100, Math.round((q - prevQ) / (minQ - prevQ) * 100));
-    }
-
-    const div = document.createElement('div');
-    div.className = 'bono-tier ' + state;
-    div.innerHTML = `
-      <span class="bono-tier-icon">${achieved ? '✅' : isNext ? '→' : '🔒'}</span>
-      <span class="bono-tier-q">${minQ} líneas</span>
-      <div class="bono-tier-bar"><div class="bono-tier-fill" style="width:${pct}%"></div></div>
-      <span class="bono-tier-val">${fmt(bono)}</span>`;
-    tbody.appendChild(div);
-  });
-
-  el('bono-mov-ganado').textContent = ganado > 0 ? `Ganado: ${fmt(ganado)}` : tieneRequisito ? 'Sin bono aún' : 'Requiere FIJA ≥ S/.220';
-  return ganado;
-}
-
-function renderTiersGpon(gpon, bonoMovilGanado, gponPct) {
-  const tbody = el('bono-tiers-gpon');
-  tbody.innerHTML = '';
-  let ganado = 0;
-
-  BONO_GPON_TIERS.forEach(([minA, bono], i) => {
-    const activo   = bonoMovilGanado > 0;
-    const achieved = activo && gpon >= minA;
-    const isNext   = activo && gpon < minA && (i === 0 || gpon >= BONO_GPON_TIERS[i-1][0]);
-    const state    = achieved ? 'achieved' : isNext ? 'next' : 'locked';
-    if (achieved) ganado = bono;
-
-    let pct = 0;
-    if (achieved) { pct = 100; }
-    else if (isNext) {
-      const prevA = i > 0 ? BONO_GPON_TIERS[i-1][0] : 0;
-      pct = Math.min(100, Math.round((gpon - prevA) / (minA - prevA) * 100));
-    }
-
-    const bonoReal = Math.round(bono * gponPct);
-    const pctTxt = gponPct < 1 ? ` (${Math.round(gponPct*100)}% = ${fmt(bonoReal)})` : '';
-    const div = document.createElement('div');
-    div.className = 'bono-tier ' + state;
-    div.innerHTML = `
-      <span class="bono-tier-icon">${achieved ? '✅' : isNext ? '→' : '🔒'}</span>
-      <span class="bono-tier-q">≥ ${fmt(minA)}</span>
-      <div class="bono-tier-bar"><div class="bono-tier-fill" style="width:${pct}%"></div></div>
-      <span class="bono-tier-val">${fmt(bono)}${pctTxt}</span>`;
-    tbody.appendChild(div);
-  });
-
-  el('bono-gpon-ganado').textContent = ganado > 0
-    ? `Ganado: ${fmt(Math.round(ganado * gponPct))} (base ${fmt(ganado)} × ${Math.round(gponPct*100)}%)`
-    : bonoMovilGanado > 0 ? 'Sin bono aún' : 'Requiere Bono Móvil';
-  return Math.round(ganado * gponPct);
-}
-
-function renderTiersFija(fija, gpon, bonoMovilGanado, gponPct) {
-  const tbody = el('bono-tiers-fija');
-  tbody.innerHTML = '';
-  let ganado = 0;
-
-  BONO_FIJA_TIERS.forEach(([minA, bono], i) => {
-    const activo   = bonoMovilGanado > 0;
-    const achieved = activo && fija >= minA;
-    const isNext   = activo && fija < minA && (i === 0 || fija >= BONO_FIJA_TIERS[i-1][0]);
-    const state    = achieved ? 'achieved' : isNext ? 'next' : 'locked';
-    if (achieved) ganado = bono;
-
-    let pct = 0;
-    if (achieved) { pct = 100; }
-    else if (isNext) {
-      const prevA = i > 0 ? BONO_FIJA_TIERS[i-1][0] : 0;
-      pct = Math.min(100, Math.round((fija - prevA) / (minA - prevA) * 100));
-    }
-
-    const bonoReal = Math.round(bono * gponPct);
-    const pctTxt = gponPct < 1 ? ` (${Math.round(gponPct*100)}% = ${fmt(bonoReal)})` : '';
-    const div = document.createElement('div');
-    div.className = 'bono-tier ' + state;
-    div.innerHTML = `
-      <span class="bono-tier-icon">${achieved ? '✅' : isNext ? '→' : '🔒'}</span>
-      <span class="bono-tier-q">≥ ${fmt(minA)}</span>
-      <div class="bono-tier-bar"><div class="bono-tier-fill" style="width:${pct}%"></div></div>
-      <span class="bono-tier-val">${fmt(bono)}${pctTxt}</span>`;
-    tbody.appendChild(div);
-  });
-
-  el('bono-fija-ganado').textContent = ganado > 0
-    ? `Ganado: ${fmt(Math.round(ganado * gponPct))} (base ${fmt(ganado)} × ${Math.round(gponPct*100)}%)`
-    : bonoMovilGanado > 0 ? 'Sin bono aún' : 'Requiere Bono Móvil';
-  return Math.round(ganado * gponPct);
-}
-
-// ═══════════════════════════════════════════════════════
-//  RECALC PRINCIPAL
-// ═══════════════════════════════════════════════════════
-function recalc() {
-  const qPorta    = v('q_porta');
-  const qNoporta  = v('q_noporta');
-  const totalQ    = qPorta + qNoporta;
-  const accMovil  = v('access_movil');
-  const accGpon   = v('access_gpon');
-  const accFijaDbi= v('access_fija_dbi');
-  const gponBono  = v('gpon_bono');
-  const fijaBono  = v('fija_bono');
-
-  const p = PERFILES[perfil];
-
-  // ── Móviles equivalentes ──────────────────────────────
-  setTxt('d_equiv', totalQ);
-
-  // ── Facturación real y factor ─────────────────────────
-  const facturacion = accMovil + accGpon;
-  const factor      = getFactor(facturacion, perfil);
-  const nextFactor  = getNextFactor(facturacion, perfil);
-
-  el('d_facturacion').textContent = fmt(facturacion);
-  el('fb_facturacion').textContent = fmt(facturacion);
-  el('fb_factor').textContent = factor.toFixed(1) + '×';
-  el('fb_factor').className = 'factor-pill' + (factor > 0 ? ' active' : '');
-
-  if (nextFactor) {
-    const faltan = nextFactor.limite - facturacion;
-    el('fb_siguiente').textContent = `Faltan ${fmt(faltan)} → factor ${nextFactor.factor.toFixed(1)}×`;
-  } else {
-    el('fb_siguiente').textContent = '🏆 Factor máximo alcanzado';
-  }
-
-  // ── Comisiones ────────────────────────────────────────
-  const comMovil = accMovil * factor;
-  const comGpon  = factor > 0 ? accGpon * 1.0 : accGpon * 0.5;
-  const comFija  = accFijaDbi * 1.2;
-  const totalCom = comMovil + comGpon + comFija;
-
-  setTxt('r_com_movil', fmt(comMovil));
-  setTxt('r_com_gpon',  fmt(comGpon));
-  setTxt('r_com_fija',  fmt(comFija));
-  setTxt('r_total_com', fmt(totalCom));
-  setTxt('r_total_com2',fmt(totalCom));
-
-  el('rc_movil').textContent = `${fmt(accMovil)} × ${factor.toFixed(1)}`;
-  el('rc_gpon').textContent  = `${fmt(accGpon)} × ${factor > 0 ? '1.0' : '0.5 (factor inactivo)'}`;
-  el('rc_fija').textContent  = `${fmt(accFijaDbi)} × 1.2`;
-
-  // ── Requisito FIJA ────────────────────────────────────
-  const reqEl  = el('req-fija');
-  const reqPct = Math.min(100, Math.round(fijaBono / 220 * 100));
-  el('req-bar').style.width = reqPct + '%';
-  el('req-pct').textContent = reqPct + '%';
-
-  const tieneRequisito = fijaBono >= 220;
-  if (tieneRequisito) {
-    reqEl.className = 'req-fija pass';
-    el('req-ico').textContent = '✅';
-    el('req-msg').innerHTML = `<strong>Requisito FIJA cumplido</strong> — S/.${fijaBono.toLocaleString('es-PE')} ≥ S/.220. Bono Móvil habilitado.`;
-    el('req-bar').style.background = 'var(--green)';
-    el('bono-req-tag').style.display = '';
-    el('bono-req-fail').style.display = 'none';
-  } else {
-    reqEl.className = 'req-fija fail';
-    el('req-ico').textContent = '⚠️';
-    const faltan = 220 - fijaBono;
-    el('req-msg').innerHTML = `<strong>Bono Móvil no aplica</strong> — Faltan S/.${faltan.toLocaleString('es-PE')} de FIJA para llegar a S/.220 (tienes S/.${fijaBono.toLocaleString('es-PE')}).`;
-    el('req-bar').style.background = fijaBono > 0 ? 'var(--gold)' : 'var(--red)';
-    el('bono-req-tag').style.display = 'none';
-    el('bono-req-fail').style.display = '';
-  }
-
-  // ── Escala % bono Feb 2026 ────────────────────────────
-  const gponPct = getPctBono(gponBono);
-  const pctLabel = gponBono < 150 ? '25%' : gponBono < 220 ? '50%' : '100%';
-  el('bono-gpon-pct-msg').innerHTML =
-    `<strong>Escala Feb 2026:</strong> GPON access S/.${gponBono.toLocaleString('es-PE')} → aplica <strong>${pctLabel}</strong> del bono GPON y FIJA.`;
-
-  // ── Bonos tiers ───────────────────────────────────────
-  const bonoMovil = renderTiersMovil(totalQ, fijaBono, perfil);
-  const bonoGpon  = renderTiersGpon(gponBono, bonoMovil, gponPct);
-  const bonoFija  = renderTiersFija(fijaBono, gponBono, bonoMovil, gponPct);
-  const totalBonos= bonoMovil + bonoGpon + bonoFija;
-
-  setTxt('r_bono_movil', fmt(bonoMovil));
-  setTxt('r_bono_gpon',  fmt(bonoGpon));
-  setTxt('r_bono_fija',  fmt(bonoFija));
-  setTxt('r_total_bonos',fmt(totalBonos));
-
-  el('rc_bono_movil').textContent = tieneRequisito ? `${totalQ} líneas equiv.` : 'Requiere S/.220+ FIJA';
-  el('rc_bono_gpon').textContent  = bonoMovil > 0 ? `${fmt(gponBono)} × ${pctLabel}` : 'Requiere Bono Móvil';
-  el('rc_bono_fija').textContent  = bonoMovil > 0 ? `${fmt(fijaBono)} × ${pctLabel}` : 'Requiere Bono Móvil';
-
-  // ── TOTAL ─────────────────────────────────────────────
-  const total = totalCom + totalBonos;
-  setTxt('r_total', fmtN(total));
-  setTxt('r_gran_total', fmt(total));
-}
-
-// ═══════════════════════════════════════════════════════
-//  PERFIL Y NAVEGACIÓN
-// ═══════════════════════════════════════════════════════
-function setPerfil(btn) {
-  document.querySelectorAll('.ptab').forEach(b => b.classList.remove('on'));
-  btn.classList.add('on');
-  perfil = btn.dataset.p;
-  el('total-pname').textContent = PERFILES[perfil].nombre;
-  recalc();
-}
-
-function showPane(id, btn) {
-  document.querySelectorAll('.pane').forEach(p => p.classList.remove('on'));
-  document.querySelectorAll('.stab').forEach(b => b.classList.remove('on'));
-  el('pane-' + id).classList.add('on');
-  btn.classList.add('on');
-}
-
-// ═══════════════════════════════════════════════════════
-//  SIMULACIONES
-// ═══════════════════════════════════════════════════════
-const SIM_DATA = {
-  C: [
-    [20, 560, 280, 270], [25, 700, 280, 270], [30, 840, 420, 270],
-    [40,1120, 420, 270], [50,1400, 560, 270], [65,1820, 560, 270],
-    [80,2240, 700, 270], [100,2800,700, 270]
-  ],
-  S: [
-    [30, 840, 280, 270], [40,1120, 420, 270], [50,1400, 420, 270],
-    [65,1820, 560, 540], [80,2240, 560, 540], [100,2800,700, 540], [120,3360,700,540]
-  ],
-  K: [
-    [40,1120, 280, 270], [50,1400, 420, 540], [65,1820, 420, 540],
-    [80,2240, 560, 810], [100,2800,560, 810], [125,3500,700, 810], [150,4200,700,810]
-  ]
-};
-
-const SIM_BASICO = { C: [1130,175], S: [1500,200], K: [1800,200] };
-
-function buildSim(pid) {
-  const tbody = el('sim-' + pid);
-  tbody.innerHTML = '';
-  const [basico, mov] = SIM_BASICO[pid];
-
-  SIM_DATA[pid].forEach(([q, accMov, accGpon, accFija]) => {
-    const fac      = getFactor(accMov + accGpon, pid);
-    const comM     = accMov * fac;
-    const comG     = fac > 0 ? accGpon : accGpon * 0.5;
-    const comF     = accFija * 1.2;
-    const gponPct  = getPctBono(accGpon);
-    // Asumir fija >= 220 en sim (ya que el objetivo es el monto estándar)
-    const fijaCump = accFija >= 220;
-    const bM       = fijaCump ? getBonoMovilBase(q, pid) : 0;
-    const bG       = bM > 0 ? Math.round(getBonoGponBase(accGpon) * gponPct) : 0;
-    const bF       = bM > 0 ? Math.round(getBonoFijaBase(accFija) * gponPct) : 0;
-    const bonos    = bM + bG + bF;
-    const total    = comM + comG + comF + bonos + basico + mov;
-
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><span class="qpill">${q}</span></td>
-      <td>${fmt(accMov)}</td>
-      <td>${fmt(accGpon)}</td>
-      <td>${fmt(accFija)}</td>
-      <td class="fac">${fac.toFixed(1)}×</td>
-      <td class="g">${fmt(comM)}</td>
-      <td class="g">${fmt(comG)}</td>
-      <td class="g">${fmt(comF)}</td>
-      <td class="g">${fmt(bonos)}</td>
-      <td class="go">${fmt(total)}</td>`;
-    tbody.appendChild(tr);
-  });
-}
-
-// ═══════════════════════════════════════════════════════
-//  INIT
-// ═══════════════════════════════════════════════════════
-// ═══════════════════════════════════════════════════════
-//  MIX DE PLANES VENDIDOS
-// ═══════════════════════════════════════════════════════
-function buildMixTable() {
-  const tbody = el('mix-plan-body');
-  tbody.innerHTML = '';
-  PLANES.forEach((plan, i) => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td style="text-align:left"><span class="qpill" style="background:#6D2E46">Plan ${i+1}</span></td>
-      <td>S/.${plan.toFixed(2)}</td>
-      <td style="text-align:center">
-        <input type="number" id="mix_q_${i}" value="0" min="0" oninput="recalcMix()"
-          style="width:64px;height:30px;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.12);
-          border-radius:6px;color:var(--gold);font-family:var(--fm);font-size:12.5px;text-align:center;outline:none">
-      </td>
-      <td class="g" id="mix_acc_${i}">0</td>
-      <td class="fac" id="mix_fac_${i}">0.00</td>
-      <td class="g" id="mix_seq_${i}">0</td>
-      <td class="g" id="mix_sacc_${i}">S/.0</td>`;
-    tbody.appendChild(tr);
-  });
-}
-
-function recalcMix() {
-  const desc = parseFloat(el('mix_descuento').value);
-  let totalLineas = 0, totalEquiv = 0, totalAccess = 0;
-
-  PLANES.forEach((plan, i) => {
-    const q = parseFloat(el(`mix_q_${i}`).value) || 0;
-    const accessReal = (plan * (1 - desc)) / 1.18;
-    const factor = getEquivalencia(accessReal);
-    const subEquiv = q * factor;
-    const subAccess = q * accessReal;
-
-    el(`mix_acc_${i}`).textContent = fmt(accessReal);
-    el(`mix_fac_${i}`).textContent = factor.toFixed(2);
-    el(`mix_seq_${i}`).textContent = subEquiv.toFixed(2);
-    el(`mix_sacc_${i}`).textContent = fmt(subAccess);
-
-    totalLineas += q;
-    totalEquiv  += subEquiv;
-    totalAccess += subAccess;
-  });
-
-  setTxt('mix_total_lineas', totalLineas);
-  setTxt('mix_total_equiv', totalEquiv.toFixed(2));
-  setTxt('mix_total_access', fmt(totalAccess));
-}
-
-function aplicarMix() {
-  const desc = parseFloat(el('mix_descuento').value);
-  let totalEquiv = 0, totalAccess = 0;
-
-  PLANES.forEach((plan, i) => {
-    const q = parseFloat(el(`mix_q_${i}`).value) || 0;
-    const accessReal = (plan * (1 - desc)) / 1.18;
-    const factor = getEquivalencia(accessReal);
-    totalEquiv  += q * factor;
-    totalAccess += q * accessReal;
-  });
-
-  // Aplicar al total equivalente como "Móviles VOZ PORTA" y poner Pack NO PORTA en 0
-  el('q_porta').value   = Math.round(totalEquiv * 100) / 100;
-  el('q_noporta').value = 0;
-  el('access_movil').value = Math.round(totalAccess);
-
-  recalc();
-
-  // feedback visual
-  const btn = event.target;
-  const original = btn.textContent;
-  btn.textContent = '✅ Valores aplicados';
-  btn.style.background = 'linear-gradient(135deg, var(--green), #34D399)';
-  setTimeout(() => {
-    btn.textContent = original;
-    btn.style.background = 'linear-gradient(135deg, var(--blue2), var(--cyan))';
-  }, 1400);
-}
-
-
-const PLANES = [31.90, 33.90, 42.90, 44.90, 59.90, 69.90, 74.90, 79.90, 85.90, 99.90, 105.90, 159.90];
-const DESCUENTOS = [0.50, 0.45, 0.40, 0.35, 0.30];
-
-// Equivalencia (factor) según Access Real, para clientes 1-29 líneas (la más usada)
-function getEquivalencia(accessReal) {
-  if (accessReal < 18)    return 0.00;
-  if (accessReal < 24)    return 0.75;
-  if (accessReal < 29)    return 1.00;
-  if (accessReal < 42)    return 1.25;
-  if (accessReal < 65)    return 1.50;
-  return 1.80;
-}
-
-function buildPlanTable() {
-  const tbody = el('plan-table-body');
-  tbody.innerHTML = '';
-  PLANES.forEach(plan => {
-    const tr = document.createElement('tr');
-    let cells = `<td><span class="qpill" style="background:#6D2E46">S/.${plan.toFixed(2)}</span></td>`;
-    DESCUENTOS.forEach(d => {
-      const accessReal = (plan * (1 - d)) / 1.18;
-      const factor = getEquivalencia(accessReal);
-      cells += `<td class="g">${fmt(accessReal)}</td><td class="fac">${factor.toFixed(2)}</td>`;
-    });
-    tr.innerHTML = cells;
-    tbody.appendChild(tr);
-  });
-}
-
-buildMixTable();
-recalcMix();
-buildPlanTable();
-buildSim('C'); buildSim('S'); buildSim('K');
-
-
-el('total-pname').textContent = PERFILES[perfil].nombre;
-recalc();
-</script>
-<!-- PRIVACY OVERLAY -->
-<div id="privacy-overlay" style="position:fixed;inset:0;background:#000;z-index:999999;
-  display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px">
-  <div style="font-size:32px">🔒</div>
-  <div style="color:rgba(255,255,255,.4);font-family:'DM Sans',sans-serif;font-size:13px">
-    Información protegida
-  </div>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════
-//  PROTECCIÓN ANTE CAMBIO DE FOCO / VISIBILIDAD
-//  (best-effort: cubre la pantalla cuando la pestaña pierde
-//   foco. No existe API estándar para bloquear screenshots
-//   del sistema operativo, esto cubre cambios de ventana/app.)
-// ═══════════════════════════════════════════════════════
-const privacyOverlay = document.getElementById('privacy-overlay');
-window.addEventListener('blur', () => privacyOverlay.style.display = 'flex');
-window.addEventListener('focus', () => privacyOverlay.style.display = 'none');
-document.addEventListener('visibilitychange', () => {
-  privacyOverlay.style.display = document.hidden ? 'flex' : 'none';
-});
-</script>
+// ═══ CONFIG ═══
+const SHEET_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRDg385vxuIcHYuIiATzyaZ9C37iPJGig7PYpR_HPDrgP3VuAZsW-n9M4W5yAhWAw/pub';
+const SHEETS = ['CONFIG','FACTORES','BONOS_MOVIL','BONOS_GPON','BONOS_FIJA','PCT_BONO','IP_PERMITIDAS'];
 
+// ═══ PROTECTION ═══
+document.addEventListener('contextmenu',e=>e.preventDefault());
+document.addEventListener('keydown',e=>{
+  const c=e.keyCode||0;
+  if(c===123||(e.ctrlKey&&e.shiftKey&&[73,74,67].includes(c))||(e.ctrlKey&&[85,83,80].includes(c)))return e.preventDefault(),!1;
+});
+document.addEventListener('copy',e=>e.preventDefault());
+
+// ═══ DATA STORE ═══
+let DATA = {};
+let ROLES = {};
+let currentRole = '';
+
+// ═══ FETCH SHEETS ═══
+async function fetchSheet(name) {
+  const urls = [
+    `${SHEET_BASE}?output=tsv&sheet=${encodeURIComponent(name)}`,
+    `${SHEET_BASE}?output=csv&sheet=${encodeURIComponent(name)}`,
+  ];
+  for (const url of urls) {
+    try {
+      const r = await fetch(url);
+      if (r.ok) { const t = await r.text(); if (t.trim().length > 5) return t; }
+    } catch(e) {}
+  }
+  return null;
+}
+
+function parseTSV(text) {
+  if (!text) return [];
+  const sep = text.includes('\t') ? '\t' : ',';
+  return text.trim().split('\n').map(r => {
+    if (sep === ',') {
+      const cells = []; let cur = '', inQ = false;
+      for (const ch of r) {
+        if (ch === '"') { inQ = !inQ; }
+        else if (ch === ',' && !inQ) { cells.push(cur.trim()); cur = ''; }
+        else { cur += ch; }
+      }
+      cells.push(cur.trim());
+      return cells;
+    }
+    return r.split('\t').map(c => c.trim().replace(/^"|"$/g,''));
+  });
+}
+
+function num(v) { return parseFloat(String(v).replace(/[^0-9.\-]/g,'')) || 0; }
+
+// ═══ INIT ═══
+async function init() {
+  try {
+    // Fetch all sheets
+    const results = {};
+    for (const name of SHEETS) {
+      results[name] = await fetchSheet(name);
+    }
+
+    // Check IP access
+    const ipRows = parseTSV(results['IP_PERMITIDAS']);
+    const ips = ipRows.slice(1).map(r => (r[0]||'').trim()).filter(ip => ip.length > 0);
+
+    if (ips.length > 0) {
+      try {
+        const ipResp = await fetch('https://api.ipify.org?format=text');
+        const myIP = (await ipResp.text()).trim();
+        if (!ips.includes(myIP)) {
+          document.getElementById('loadScreen').style.display = 'none';
+          document.getElementById('blockedScreen').style.display = 'flex';
+          document.getElementById('blockedIP').textContent = 'Tu IP: ' + myIP;
+          return;
+        }
+      } catch(e) {
+        // Can't determine IP, block by default if list exists
+        document.getElementById('loadScreen').style.display = 'none';
+        document.getElementById('blockedScreen').style.display = 'flex';
+        return;
+      }
+    }
+
+    // Parse CONFIG
+    const cfg = parseTSV(results['CONFIG']);
+    const roles = ['comercial','senior','kam'];
+    const cfgMap = {};
+    cfg.slice(1).forEach(row => { cfgMap[row[0]] = [row[1], row[2], row[3]]; });
+
+    roles.forEach((role, i) => {
+      ROLES[role] = {
+        name: cfgMap['nombre'] ? cfgMap['nombre'][i] : role,
+        basico: num(cfgMap['basico']?.[i]),
+        movilidad: num(cfgMap['movilidad']?.[i]),
+        movilidadAdelantada: (cfgMap['movilidad_adelantada']?.[i]||'').toUpperCase() === 'SI',
+        factorFija: num(cfgMap['factor_fija']?.[i]) || 1.2,
+        minMovil: num(cfgMap['min_movil']?.[i]),
+        tablaFactor: [],
+        bonoMovil: [],
+        bonoGpon: [],
+        bonoFija: [],
+      };
+    });
+
+    // Parse FACTORES
+    parseTSV(results['FACTORES']).slice(1).forEach(r => {
+      const role = r[0]?.toLowerCase();
+      if (ROLES[role]) {
+        ROLES[role].tablaFactor.push({ min: num(r[1]), max: num(r[2]) >= 999990 ? Infinity : num(r[2]), factor: num(r[3]) });
+      }
+    });
+
+    // Parse BONOS_MOVIL
+    parseTSV(results['BONOS_MOVIL']).slice(1).forEach(r => {
+      const role = r[0]?.toLowerCase();
+      if (ROLES[role]) ROLES[role].bonoMovil.push({ q: num(r[1]), bono: num(r[2]) });
+    });
+
+    // Parse BONOS_GPON
+    parseTSV(results['BONOS_GPON']).slice(1).forEach(r => {
+      const role = r[0]?.toLowerCase();
+      if (ROLES[role]) ROLES[role].bonoGpon.push({ min: num(r[1]), max: num(r[2]) >= 999990 ? Infinity : num(r[2]), bono: num(r[3]) });
+    });
+
+    // Parse BONOS_FIJA
+    parseTSV(results['BONOS_FIJA']).slice(1).forEach(r => {
+      const role = r[0]?.toLowerCase();
+      if (ROLES[role]) ROLES[role].bonoFija.push({ min: num(r[1]), max: num(r[2]) >= 999990 ? Infinity : num(r[2]), bono: num(r[3]) });
+    });
+
+    // Parse PCT_BONO
+    DATA.pctBono = [];
+    parseTSV(results['PCT_BONO']).slice(1).forEach(r => {
+      DATA.pctBono.push({ min: num(r[0]), max: num(r[1]) >= 999990 ? Infinity : num(r[1]), pct: num(r[2]) });
+    });
+
+    // Build role selector
+    const sel = document.getElementById('roleSelect');
+    sel.innerHTML = '';
+    roles.forEach(role => {
+      if (ROLES[role] && ROLES[role].tablaFactor.length > 0) {
+        const maxF = ROLES[role].tablaFactor[ROLES[role].tablaFactor.length-1]?.factor || 0;
+        const opt = document.createElement('option');
+        opt.value = role;
+        opt.textContent = `${ROLES[role].name} — Factor máx. ${maxF} · Básico S/.${ROLES[role].basico.toLocaleString('es-PE')}`;
+        sel.appendChild(opt);
+      }
+    });
+
+    currentRole = roles[0];
+    document.getElementById('loadScreen').style.display = 'none';
+    document.getElementById('appContent').style.display = 'block';
+    recalc();
+
+  } catch(err) {
+    document.getElementById('loadScreen').innerHTML = `
+      <div style="color:var(--red);font-size:16px;font-weight:700;text-align:center;">Error al cargar datos</div>
+      <div style="color:var(--g500);font-size:12px;max-width:400px;text-align:center;line-height:1.6;margin-top:8px;">
+        Verifica que el Google Sheet esté publicado correctamente.<br>
+        <em>Archivo > Compartir > Publicar en la web > Documento completo</em><br><br>
+        <span style="font-size:11px;color:var(--g300);">${err.message}</span>
+      </div>`;
+  }
+}
+
+// ═══ HELPERS ═══
+const fmt = v => 'S/. ' + Math.round(v).toLocaleString('es-PE');
+
+function getFactor(tabla, f) {
+  for (let i = tabla.length - 1; i >= 0; i--) { if (f >= tabla[i].min) return tabla[i]; }
+  return tabla[0];
+}
+function getBonoMovil(tabla, q) {
+  let m = null; for (const r of tabla) { if (q >= r.q) m = r; } return m ? m.bono : 0;
+}
+function getBono(tabla, access) {
+  for (const r of tabla) { if (access >= r.min && access <= r.max) return r.bono; }
+  if (tabla.length && access >= tabla[tabla.length-1].min) return tabla[tabla.length-1].bono;
+  return 0;
+}
+function getPctBono(fija) {
+  if (!DATA.pctBono || DATA.pctBono.length === 0) { return fija < 150 ? 0.25 : fija < 220 ? 0.50 : 1.0; }
+  for (const r of DATA.pctBono) { if (fija >= r.min && fija <= r.max) return r.pct; }
+  return DATA.pctBono[DATA.pctBono.length-1]?.pct || 1.0;
+}
+
+function setRole(role) { currentRole = role; recalc(); }
+
+function renderEscala(tabla, fr) {
+  const el = document.getElementById('factorEscala'); el.innerHTML = '';
+  let ia = 0;
+  for (let i = tabla.length - 1; i >= 0; i--) { if (fr >= tabla[i].min) { ia = i; break; } }
+  tabla.forEach((row, idx) => {
+    const ea = idx === ia;
+    const ml = row.max === Infinity ? 'a más' : 'S/. ' + row.max.toLocaleString('es-PE');
+    const rt = `S/. ${row.min.toLocaleString('es-PE')} – ${ml}`;
+    let ft = '';
+    if (ea && idx < tabla.length - 1) { const f = tabla[idx+1].min - fr; if (f > 0) ft = `Faltan S/. ${f.toLocaleString('es-PE')} para ×${tabla[idx+1].factor}`; }
+    if (ea && idx === tabla.length - 1) ft = '¡Factor máximo!';
+    let pct = 0;
+    if (ea) { const tw = row.max === Infinity ? 500 : (row.max - row.min); pct = Math.min(100, Math.round(((fr - row.min) / tw) * 100)); }
+    const div = document.createElement('div');
+    div.className = 'tramo-row' + (ea ? ' activo' : '');
+    div.innerHTML = `<span class="tramo-factor">${row.factor === 0 ? '–' : '×'+row.factor}</span><span class="tramo-rango">${rt}</span>${ea ? `<span class="tramo-badge-activo">Aquí</span>` : ''}${ea && ft ? `<span class="tramo-falta">${ft}</span>` : ''}${ea ? `<div class="tramo-bar" style="width:${pct}%"></div>` : ''}`;
+    el.appendChild(div);
+  });
+}
+
+function renderBonoTable(tabla, q) {
+  const el = document.getElementById('bonoMovilTable'); el.innerHTML = '';
+  tabla.forEach(row => {
+    const div = document.createElement('div');
+    div.className = 'bonus-row' + (q >= row.q ? ' active' : '');
+    div.innerHTML = `<span class="b-label">${row.q} líneas</span><span>${fmt(row.bono)}</span>`;
+    el.appendChild(div);
+  });
+}
+
+// ═══ MAIN CALC ═══
+function recalc() {
+  const rol = ROLES[currentRole]; if (!rol) return;
+  const qM = parseFloat(document.getElementById('qMoviles').value) || 0;
+  const aM = parseFloat(document.getElementById('accessMovil').value) || 0;
+  const aG = parseFloat(document.getElementById('accessGpon').value) || 0;
+  const aF = parseFloat(document.getElementById('accessFija').value) || 0;
+  const tM = document.getElementById('tipoMovil').value;
+  const gF = document.getElementById('gponFactura').value;
+
+  document.getElementById('badgeRole').textContent = rol.name;
+  const fGpon = gF === 'si' ? 1.0 : 0.5;
+  const fReal = tM === 'chipNoPack' ? aG : aM + aG;
+  const rf = getFactor(rol.tablaFactor, fReal);
+  let fb = rf.factor, ff = fb;
+  if (tM === 'noPortaPack') ff = fb * 0.7;
+  if (tM === 'chipNoPack') ff = 0.5;
+
+  let cM = tM !== 'chipNoPack' ? aM * ff : aM * 0.5;
+  const cG = aG * fGpon, cF = aF * rol.factorFija;
+  const pb = getPctBono(aF);
+  const cumple = qM >= rol.minMovil;
+
+  let bmb = 0, bm = 0, bg = 0, bf = 0;
+  if (cumple) {
+    bmb = getBonoMovil(rol.bonoMovil, qM);
+    bm = bmb * pb;
+    bg = getBono(rol.bonoGpon, aG);
+    bf = getBono(rol.bonoFija, aF);
+  }
+
+  const total = cM + cG + cF + bm + bg + bf + rol.basico + rol.movilidad;
+
+  // UI
+  document.getElementById('factorMovilVal').textContent = ff.toFixed(1);
+  const rs = rf.min === 0
+    ? `S/. 0 – S/. ${rf.max === Infinity ? '∞' : rf.max.toLocaleString('es-PE')}`
+    : `S/. ${rf.min.toLocaleString('es-PE')} – ${rf.max === Infinity ? 'a más' : 'S/. ' + rf.max.toLocaleString('es-PE')}`;
+  document.getElementById('factorRange').textContent = `Rango: ${rs} (Fact. real: S/. ${Math.round(fReal).toLocaleString('es-PE')})`;
+
+  let amh = '';
+  if (!cumple && qM > 0) amh = `<div class="alert alert-err">✗ ${qM} líneas < ${rol.minMovil} mínimo. Sin bono de estructura. Faltan ${rol.minMovil - qM} líneas.</div>`;
+  else if (tM === 'noPortaPack') amh = `<div class="alert alert-warn">⚠ Factor ×0.7 por No PORTA PACK (${fb.toFixed(1)} → ${ff.toFixed(2)})</div>`;
+  else if (tM === 'chipNoPack') amh = `<div class="alert alert-warn">⚠ CHIP NO PORTA/BAM: factor 0.5 fijo, no suma a facturación real.</div>`;
+  else if (fb === 0) amh = `<div class="alert alert-err">✗ Facturación real S/. ${Math.round(fReal).toLocaleString('es-PE')} bajo umbral mínimo. Factor = 0.</div>`;
+  else if (fb >= rol.tablaFactor[rol.tablaFactor.length-1]?.factor) amh = `<div class="alert alert-ok">✓ Factor máximo (${ff.toFixed(1)}) alcanzado.</div>`;
+  document.getElementById('alertMovil').innerHTML = amh;
+  document.getElementById('alertGpon').innerHTML = gF === 'no' ? `<div class="alert alert-warn" style="margin-top:8px;">⚠ Sin facturación activa: factor GPON 0.5</div>` : '';
+
+  let afh = '';
+  if (aF < 150) afh = `<div class="alert alert-err" style="margin-top:8px;">✗ S/. ${aF.toFixed(0)} < S/.150 → Bono al 25%.</div>`;
+  else if (aF < 220) afh = `<div class="alert alert-warn" style="margin-top:8px;">⚠ S/. ${aF.toFixed(0)} → Bono al 50%. Faltan S/. ${(220 - aF).toFixed(0)} para 100%.</div>`;
+  else afh = `<div class="alert alert-ok" style="margin-top:8px;">✓ S/. ${aF.toFixed(0)} ≥ S/.220 → Bono al 100%.</div>`;
+  document.getElementById('alertFija').innerHTML = afh;
+
+  const pct = Math.round(pb * 100);
+  document.getElementById('sbar1').className = 'scale-bar' + (pct >= 25 ? ' active' : '');
+  document.getElementById('sbar2').className = 'scale-bar' + (pct >= 50 ? ' active' : '');
+  document.getElementById('sbar3').className = 'scale-bar' + (pct >= 100 ? ' active' : '');
+  document.getElementById('scalePct').textContent = pct + '%';
+
+  document.getElementById('rComMovil').textContent = fmt(cM);
+  document.getElementById('rComMovilSub').textContent = `${fmt(aM)} × ${ff.toFixed(2)}`;
+  document.getElementById('rComGpon').textContent = fmt(cG);
+  document.getElementById('rComGponSub').textContent = `${fmt(aG)} × ${fGpon.toFixed(1)}`;
+  document.getElementById('rComFija').textContent = fmt(cF);
+  document.getElementById('rComFijaSub').textContent = `${fmt(aF)} × ${rol.factorFija.toFixed(1)}`;
+  document.getElementById('rBasico').textContent = fmt(rol.basico);
+  document.getElementById('rBonoMovil').textContent = fmt(bm);
+  document.getElementById('rBonoMovilSub').textContent = !cumple ? `Req. mín. ${rol.minMovil} líneas` : bmb > 0 ? `${fmt(bmb)} × ${pct}%` : '—';
+  document.getElementById('rBonoGpon').textContent = fmt(bg);
+  document.getElementById('rBonoGponSub').textContent = !cumple ? `Req. mín. ${rol.minMovil} líneas` : aG >= 220 ? 'Access ≥ S/.220' : 'Access < S/.220';
+  document.getElementById('rBonoFija').textContent = fmt(bf);
+  document.getElementById('rBonoFijaSub').textContent = !cumple ? `Req. mín. ${rol.minMovil} líneas` : aF >= 200 ? 'Access ≥ S/.200' : 'Access < S/.200';
+  document.getElementById('rMovilidad').textContent = fmt(rol.movilidad);
+  document.getElementById('rMovilidadSub').textContent = rol.movilidadAdelantada ? 'Adelantada, sin reversión' : 'Con posible reversión';
+  document.getElementById('rTotal').innerHTML = `<span>S/.</span>${Math.round(total).toLocaleString('es-PE')}`;
+
+  renderBonoTable(rol.bonoMovil, qM);
+  renderEscala(rol.tablaFactor, fReal);
+}
+
+// ═══ START ═══
+init();
+</script>
 </body>
 </html>
