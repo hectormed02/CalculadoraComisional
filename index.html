@@ -199,8 +199,7 @@
 
 <script>
 // ═══ CONFIG ═══
-const SHEET_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRDg385vxuIcHYuIiATzyaZ9C37iPJGig7PYpR_HPDrgP3VuAZsW-n9M4W5yAhWAw/pub';
-const SHEETS = ['CONFIG','FACTORES','BONOS_MOVIL','BONOS_GPON','BONOS_FIJA','PCT_BONO','IP_PERMITIDAS'];
+const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRWoqs6c5VY6pZW0KiErWNTGT7tSy3NG4VhlYHJMnycTpTLe9Q1UoqzL8ZSEyFGaw/pub?output=csv';
 
 // ═══ PROTECTION ═══
 document.addEventListener('contextmenu',e=>e.preventDefault());
@@ -210,136 +209,139 @@ document.addEventListener('keydown',e=>{
 });
 document.addEventListener('copy',e=>e.preventDefault());
 
-// ═══ DATA STORE ═══
-let DATA = {};
-let ROLES = {};
-let currentRole = '';
+// ═══ GLOBALS ═══
+let ROLES = {}, DATA = {}, currentRole = '';
 
-// ═══ FETCH SHEETS ═══
-async function fetchSheet(name) {
-  const urls = [
-    `${SHEET_BASE}?output=tsv&sheet=${encodeURIComponent(name)}`,
-    `${SHEET_BASE}?output=csv&sheet=${encodeURIComponent(name)}`,
-  ];
-  for (const url of urls) {
-    try {
-      const r = await fetch(url);
-      if (r.ok) { const t = await r.text(); if (t.trim().length > 5) return t; }
-    } catch(e) {}
-  }
-  return null;
-}
-
+// ═══ PARSE ═══
 function parseTSV(text) {
   if (!text) return [];
   const sep = text.includes('\t') ? '\t' : ',';
-  return text.trim().split('\n').map(r => {
-    if (sep === ',') {
-      const cells = []; let cur = '', inQ = false;
-      for (const ch of r) {
-        if (ch === '"') { inQ = !inQ; }
-        else if (ch === ',' && !inQ) { cells.push(cur.trim()); cur = ''; }
-        else { cur += ch; }
-      }
-      cells.push(cur.trim());
-      return cells;
+  return text.trim().split('\n').map(line => {
+    line = line.replace(/\r/g, '');
+    if (sep === '\t') return line.split('\t').map(c => c.trim().replace(/^"|"$/g,''));
+    const cells = []; let cur = '', inQ = false;
+    for (const ch of line) {
+      if (ch === '"') inQ = !inQ;
+      else if (ch === ',' && !inQ) { cells.push(cur.trim()); cur = ''; }
+      else cur += ch;
     }
-    return r.split('\t').map(c => c.trim().replace(/^"|"$/g,''));
+    cells.push(cur.trim());
+    return cells.map(c => c.replace(/^"|"$/g,''));
   });
 }
 
-function num(v) { return parseFloat(String(v).replace(/[^0-9.\-]/g,'')) || 0; }
+function extractSections(rows) {
+  const sections = {};
+  let current = null, data = [];
+  rows.forEach(row => {
+    const first = (row[0] || '').trim().replace(/^"|"$/g,'');
+    const match = first.match(/^\[(.+)\]$/);
+    if (match) {
+      if (current) sections[current] = data;
+      current = match[1]; data = [];
+    } else if (current && row.some(c => c && c.trim())) {
+      data.push(row);
+    }
+  });
+  if (current) sections[current] = data;
+  return sections;
+}
+
+function num(v) { return parseFloat(String(v).replace(/[^0-9.\-]/g, '')) || 0; }
 
 // ═══ INIT ═══
 async function init() {
   try {
-    // Fetch all sheets
-    const results = {};
-    for (const name of SHEETS) {
-      results[name] = await fetchSheet(name);
-    }
+    const resp = await fetch(SHEET_URL);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const text = await resp.text();
+    const rows = parseTSV(text);
+    const S = extractSections(rows);
 
-    // Check IP access
-    const ipRows = parseTSV(results['IP_PERMITIDAS']);
-    const ips = ipRows.slice(1).map(r => (r[0]||'').trim()).filter(ip => ip.length > 0);
-
-    if (ips.length > 0) {
-      try {
-        const ipResp = await fetch('https://api.ipify.org?format=text');
-        const myIP = (await ipResp.text()).trim();
-        if (!ips.includes(myIP)) {
+    // ── IP CHECK ──
+    if (S['IP_PERMITIDAS']) {
+      const ipRows = S['IP_PERMITIDAS'].slice(1); // skip header
+      const ips = ipRows.map(r => (r[0]||'').trim()).filter(ip => ip.length > 0);
+      if (ips.length > 0) {
+        try {
+          const ipResp = await fetch('https://api.ipify.org?format=text');
+          const myIP = (await ipResp.text()).trim();
+          if (!ips.includes(myIP)) {
+            document.getElementById('loadScreen').style.display = 'none';
+            document.getElementById('blockedScreen').style.display = 'flex';
+            document.getElementById('blockedIP').textContent = 'Tu IP: ' + myIP;
+            return;
+          }
+        } catch(e) {
           document.getElementById('loadScreen').style.display = 'none';
           document.getElementById('blockedScreen').style.display = 'flex';
-          document.getElementById('blockedIP').textContent = 'Tu IP: ' + myIP;
           return;
         }
-      } catch(e) {
-        // Can't determine IP, block by default if list exists
-        document.getElementById('loadScreen').style.display = 'none';
-        document.getElementById('blockedScreen').style.display = 'flex';
-        return;
       }
     }
 
-    // Parse CONFIG
-    const cfg = parseTSV(results['CONFIG']);
-    const roles = ['comercial','senior','kam'];
+    // ── CONFIG ──
+    const roles = ['comercial', 'senior', 'kam'];
     const cfgMap = {};
-    cfg.slice(1).forEach(row => { cfgMap[row[0]] = [row[1], row[2], row[3]]; });
-
+    if (S['CONFIG']) {
+      S['CONFIG'].slice(1).forEach(row => {
+        cfgMap[(row[0]||'').trim().toLowerCase()] = [row[1], row[2], row[3]];
+      });
+    }
     roles.forEach((role, i) => {
       ROLES[role] = {
-        name: cfgMap['nombre'] ? cfgMap['nombre'][i] : role,
+        name: cfgMap['nombre'] ? (cfgMap['nombre'][i]||role).trim() : role,
         basico: num(cfgMap['basico']?.[i]),
         movilidad: num(cfgMap['movilidad']?.[i]),
-        movilidadAdelantada: (cfgMap['movilidad_adelantada']?.[i]||'').toUpperCase() === 'SI',
+        movilidadAdelantada: (cfgMap['movilidad_adelantada']?.[i]||'').trim().toUpperCase() === 'SI',
         factorFija: num(cfgMap['factor_fija']?.[i]) || 1.2,
         minMovil: num(cfgMap['min_movil']?.[i]),
-        tablaFactor: [],
-        bonoMovil: [],
-        bonoGpon: [],
-        bonoFija: [],
+        tablaFactor: [], bonoMovil: [], bonoGpon: [], bonoFija: [],
       };
     });
 
-    // Parse FACTORES
-    parseTSV(results['FACTORES']).slice(1).forEach(r => {
-      const role = r[0]?.toLowerCase();
-      if (ROLES[role]) {
-        ROLES[role].tablaFactor.push({ min: num(r[1]), max: num(r[2]) >= 999990 ? Infinity : num(r[2]), factor: num(r[3]) });
-      }
+    // ── FACTORES ──
+    if (S['FACTORES']) S['FACTORES'].slice(1).forEach(r => {
+      const role = (r[0]||'').trim().toLowerCase();
+      if (ROLES[role]) ROLES[role].tablaFactor.push({
+        min: num(r[1]), max: num(r[2]) >= 999990 ? Infinity : num(r[2]), factor: num(r[3])
+      });
     });
 
-    // Parse BONOS_MOVIL
-    parseTSV(results['BONOS_MOVIL']).slice(1).forEach(r => {
-      const role = r[0]?.toLowerCase();
+    // ── BONOS_MOVIL ──
+    if (S['BONOS_MOVIL']) S['BONOS_MOVIL'].slice(1).forEach(r => {
+      const role = (r[0]||'').trim().toLowerCase();
       if (ROLES[role]) ROLES[role].bonoMovil.push({ q: num(r[1]), bono: num(r[2]) });
     });
 
-    // Parse BONOS_GPON
-    parseTSV(results['BONOS_GPON']).slice(1).forEach(r => {
-      const role = r[0]?.toLowerCase();
-      if (ROLES[role]) ROLES[role].bonoGpon.push({ min: num(r[1]), max: num(r[2]) >= 999990 ? Infinity : num(r[2]), bono: num(r[3]) });
+    // ── BONOS_GPON ──
+    if (S['BONOS_GPON']) S['BONOS_GPON'].slice(1).forEach(r => {
+      const role = (r[0]||'').trim().toLowerCase();
+      if (ROLES[role]) ROLES[role].bonoGpon.push({
+        min: num(r[1]), max: num(r[2]) >= 999990 ? Infinity : num(r[2]), bono: num(r[3])
+      });
     });
 
-    // Parse BONOS_FIJA
-    parseTSV(results['BONOS_FIJA']).slice(1).forEach(r => {
-      const role = r[0]?.toLowerCase();
-      if (ROLES[role]) ROLES[role].bonoFija.push({ min: num(r[1]), max: num(r[2]) >= 999990 ? Infinity : num(r[2]), bono: num(r[3]) });
+    // ── BONOS_FIJA ──
+    if (S['BONOS_FIJA']) S['BONOS_FIJA'].slice(1).forEach(r => {
+      const role = (r[0]||'').trim().toLowerCase();
+      if (ROLES[role]) ROLES[role].bonoFija.push({
+        min: num(r[1]), max: num(r[2]) >= 999990 ? Infinity : num(r[2]), bono: num(r[3])
+      });
     });
 
-    // Parse PCT_BONO
+    // ── PCT_BONO ──
     DATA.pctBono = [];
-    parseTSV(results['PCT_BONO']).slice(1).forEach(r => {
+    if (S['PCT_BONO']) S['PCT_BONO'].slice(1).forEach(r => {
       DATA.pctBono.push({ min: num(r[0]), max: num(r[1]) >= 999990 ? Infinity : num(r[1]), pct: num(r[2]) });
     });
 
-    // Build role selector
+    // ── BUILD UI ──
     const sel = document.getElementById('roleSelect');
     sel.innerHTML = '';
     roles.forEach(role => {
       if (ROLES[role] && ROLES[role].tablaFactor.length > 0) {
-        const maxF = ROLES[role].tablaFactor[ROLES[role].tablaFactor.length-1]?.factor || 0;
+        const maxF = ROLES[role].tablaFactor[ROLES[role].tablaFactor.length - 1]?.factor || 0;
         const opt = document.createElement('option');
         opt.value = role;
         opt.textContent = `${ROLES[role].name} — Factor máx. ${maxF} · Básico S/.${ROLES[role].basico.toLocaleString('es-PE')}`;
@@ -354,54 +356,42 @@ async function init() {
 
   } catch(err) {
     document.getElementById('loadScreen').innerHTML = `
-      <div style="color:var(--red);font-size:16px;font-weight:700;text-align:center;">Error al cargar datos</div>
-      <div style="color:var(--g500);font-size:12px;max-width:400px;text-align:center;line-height:1.6;margin-top:8px;">
-        Verifica que el Google Sheet esté publicado correctamente.<br>
-        <em>Archivo > Compartir > Publicar en la web > Documento completo</em><br><br>
-        <span style="font-size:11px;color:var(--g300);">${err.message}</span>
+      <div style="color:#D32F2F;font-size:16px;font-weight:700;text-align:center;">Error al cargar datos</div>
+      <div style="color:#6B7491;font-size:12px;max-width:420px;text-align:center;line-height:1.7;margin-top:12px;">
+        Verifica que el Google Sheet esté publicado:<br>
+        <em>Archivo > Compartir > Publicar en la web > Documento completo > TSV</em><br><br>
+        <span style="font-size:11px;color:#C4CAD9;">Detalle: ${err.message}</span>
       </div>`;
   }
 }
 
 // ═══ HELPERS ═══
 const fmt = v => 'S/. ' + Math.round(v).toLocaleString('es-PE');
-
-function getFactor(tabla, f) {
-  for (let i = tabla.length - 1; i >= 0; i--) { if (f >= tabla[i].min) return tabla[i]; }
-  return tabla[0];
+function getFactor(t, f) { for (let i = t.length-1; i >= 0; i--) { if (f >= t[i].min) return t[i]; } return t[0]; }
+function getBonoMovil(t, q) { let m = null; for (const r of t) { if (q >= r.q) m = r; } return m ? m.bono : 0; }
+function getBono(t, a) { for (const r of t) { if (a >= r.min && a <= r.max) return r.bono; } if (t.length && a >= t[t.length-1].min) return t[t.length-1].bono; return 0; }
+function getPctBono(f) {
+  if (DATA.pctBono?.length) { for (const r of DATA.pctBono) { if (f >= r.min && f <= r.max) return r.pct; } return DATA.pctBono[DATA.pctBono.length-1]?.pct||1; }
+  return f < 150 ? 0.25 : f < 220 ? 0.50 : 1.0;
 }
-function getBonoMovil(tabla, q) {
-  let m = null; for (const r of tabla) { if (q >= r.q) m = r; } return m ? m.bono : 0;
-}
-function getBono(tabla, access) {
-  for (const r of tabla) { if (access >= r.min && access <= r.max) return r.bono; }
-  if (tabla.length && access >= tabla[tabla.length-1].min) return tabla[tabla.length-1].bono;
-  return 0;
-}
-function getPctBono(fija) {
-  if (!DATA.pctBono || DATA.pctBono.length === 0) { return fija < 150 ? 0.25 : fija < 220 ? 0.50 : 1.0; }
-  for (const r of DATA.pctBono) { if (fija >= r.min && fija <= r.max) return r.pct; }
-  return DATA.pctBono[DATA.pctBono.length-1]?.pct || 1.0;
-}
-
-function setRole(role) { currentRole = role; recalc(); }
+function setRole(r) { currentRole = r; recalc(); }
 
 function renderEscala(tabla, fr) {
   const el = document.getElementById('factorEscala'); el.innerHTML = '';
   let ia = 0;
-  for (let i = tabla.length - 1; i >= 0; i--) { if (fr >= tabla[i].min) { ia = i; break; } }
+  for (let i = tabla.length-1; i >= 0; i--) { if (fr >= tabla[i].min) { ia = i; break; } }
   tabla.forEach((row, idx) => {
     const ea = idx === ia;
     const ml = row.max === Infinity ? 'a más' : 'S/. ' + row.max.toLocaleString('es-PE');
     const rt = `S/. ${row.min.toLocaleString('es-PE')} – ${ml}`;
     let ft = '';
-    if (ea && idx < tabla.length - 1) { const f = tabla[idx+1].min - fr; if (f > 0) ft = `Faltan S/. ${f.toLocaleString('es-PE')} para ×${tabla[idx+1].factor}`; }
-    if (ea && idx === tabla.length - 1) ft = '¡Factor máximo!';
+    if (ea && idx < tabla.length-1) { const d = tabla[idx+1].min - fr; if (d > 0) ft = `Faltan S/. ${d.toLocaleString('es-PE')} para ×${tabla[idx+1].factor}`; }
+    if (ea && idx === tabla.length-1) ft = '¡Factor máximo!';
     let pct = 0;
     if (ea) { const tw = row.max === Infinity ? 500 : (row.max - row.min); pct = Math.min(100, Math.round(((fr - row.min) / tw) * 100)); }
     const div = document.createElement('div');
     div.className = 'tramo-row' + (ea ? ' activo' : '');
-    div.innerHTML = `<span class="tramo-factor">${row.factor === 0 ? '–' : '×'+row.factor}</span><span class="tramo-rango">${rt}</span>${ea ? `<span class="tramo-badge-activo">Aquí</span>` : ''}${ea && ft ? `<span class="tramo-falta">${ft}</span>` : ''}${ea ? `<div class="tramo-bar" style="width:${pct}%"></div>` : ''}`;
+    div.innerHTML = `<span class="tramo-factor">${row.factor===0?'–':'×'+row.factor}</span><span class="tramo-rango">${rt}</span>${ea?'<span class="tramo-badge-activo">Aquí</span>':''}${ea&&ft?`<span class="tramo-falta">${ft}</span>`:''}${ea?`<div class="tramo-bar" style="width:${pct}%"></div>`:''}`;
     el.appendChild(div);
   });
 }
@@ -419,80 +409,72 @@ function renderBonoTable(tabla, q) {
 // ═══ MAIN CALC ═══
 function recalc() {
   const rol = ROLES[currentRole]; if (!rol) return;
-  const qM = parseFloat(document.getElementById('qMoviles').value) || 0;
-  const aM = parseFloat(document.getElementById('accessMovil').value) || 0;
-  const aG = parseFloat(document.getElementById('accessGpon').value) || 0;
-  const aF = parseFloat(document.getElementById('accessFija').value) || 0;
+  const qM = parseFloat(document.getElementById('qMoviles').value)||0;
+  const aM = parseFloat(document.getElementById('accessMovil').value)||0;
+  const aG = parseFloat(document.getElementById('accessGpon').value)||0;
+  const aF = parseFloat(document.getElementById('accessFija').value)||0;
   const tM = document.getElementById('tipoMovil').value;
   const gF = document.getElementById('gponFactura').value;
 
   document.getElementById('badgeRole').textContent = rol.name;
-  const fGpon = gF === 'si' ? 1.0 : 0.5;
-  const fReal = tM === 'chipNoPack' ? aG : aM + aG;
+  const fGpon = gF==='si'?1.0:0.5;
+  const fReal = tM==='chipNoPack'?aG:aM+aG;
   const rf = getFactor(rol.tablaFactor, fReal);
   let fb = rf.factor, ff = fb;
-  if (tM === 'noPortaPack') ff = fb * 0.7;
-  if (tM === 'chipNoPack') ff = 0.5;
+  if (tM==='noPortaPack') ff = fb*0.7;
+  if (tM==='chipNoPack') ff = 0.5;
 
-  let cM = tM !== 'chipNoPack' ? aM * ff : aM * 0.5;
-  const cG = aG * fGpon, cF = aF * rol.factorFija;
+  const cM = tM!=='chipNoPack'?aM*ff:aM*0.5;
+  const cG = aG*fGpon, cF = aF*rol.factorFija;
   const pb = getPctBono(aF);
   const cumple = qM >= rol.minMovil;
 
-  let bmb = 0, bm = 0, bg = 0, bf = 0;
-  if (cumple) {
-    bmb = getBonoMovil(rol.bonoMovil, qM);
-    bm = bmb * pb;
-    bg = getBono(rol.bonoGpon, aG);
-    bf = getBono(rol.bonoFija, aF);
-  }
+  let bmb=0,bm=0,bg=0,bf=0;
+  if (cumple) { bmb=getBonoMovil(rol.bonoMovil,qM); bm=bmb*pb; bg=getBono(rol.bonoGpon,aG); bf=getBono(rol.bonoFija,aF); }
 
-  const total = cM + cG + cF + bm + bg + bf + rol.basico + rol.movilidad;
+  const total = cM+cG+cF+bm+bg+bf+rol.basico+rol.movilidad;
 
-  // UI
   document.getElementById('factorMovilVal').textContent = ff.toFixed(1);
-  const rs = rf.min === 0
-    ? `S/. 0 – S/. ${rf.max === Infinity ? '∞' : rf.max.toLocaleString('es-PE')}`
-    : `S/. ${rf.min.toLocaleString('es-PE')} – ${rf.max === Infinity ? 'a más' : 'S/. ' + rf.max.toLocaleString('es-PE')}`;
+  const rs = rf.min===0?`S/. 0 – S/. ${rf.max===Infinity?'∞':rf.max.toLocaleString('es-PE')}`:`S/. ${rf.min.toLocaleString('es-PE')} – ${rf.max===Infinity?'a más':'S/. '+rf.max.toLocaleString('es-PE')}`;
   document.getElementById('factorRange').textContent = `Rango: ${rs} (Fact. real: S/. ${Math.round(fReal).toLocaleString('es-PE')})`;
 
   let amh = '';
-  if (!cumple && qM > 0) amh = `<div class="alert alert-err">✗ ${qM} líneas < ${rol.minMovil} mínimo. Sin bono de estructura. Faltan ${rol.minMovil - qM} líneas.</div>`;
-  else if (tM === 'noPortaPack') amh = `<div class="alert alert-warn">⚠ Factor ×0.7 por No PORTA PACK (${fb.toFixed(1)} → ${ff.toFixed(2)})</div>`;
-  else if (tM === 'chipNoPack') amh = `<div class="alert alert-warn">⚠ CHIP NO PORTA/BAM: factor 0.5 fijo, no suma a facturación real.</div>`;
-  else if (fb === 0) amh = `<div class="alert alert-err">✗ Facturación real S/. ${Math.round(fReal).toLocaleString('es-PE')} bajo umbral mínimo. Factor = 0.</div>`;
-  else if (fb >= rol.tablaFactor[rol.tablaFactor.length-1]?.factor) amh = `<div class="alert alert-ok">✓ Factor máximo (${ff.toFixed(1)}) alcanzado.</div>`;
+  if (!cumple&&qM>0) amh=`<div class="alert alert-err">✗ ${qM} líneas < ${rol.minMovil} mínimo. Sin bono. Faltan ${rol.minMovil-qM}.</div>`;
+  else if (tM==='noPortaPack') amh=`<div class="alert alert-warn">⚠ Factor ×0.7 No PORTA PACK (${fb.toFixed(1)} → ${ff.toFixed(2)})</div>`;
+  else if (tM==='chipNoPack') amh=`<div class="alert alert-warn">⚠ CHIP NO PORTA/BAM: factor 0.5, no suma a fact. real.</div>`;
+  else if (fb===0) amh=`<div class="alert alert-err">✗ Fact. real S/.${Math.round(fReal).toLocaleString('es-PE')} bajo umbral. Factor=0.</div>`;
+  else if (fb>=rol.tablaFactor[rol.tablaFactor.length-1]?.factor) amh=`<div class="alert alert-ok">✓ Factor máximo (${ff.toFixed(1)}) alcanzado.</div>`;
   document.getElementById('alertMovil').innerHTML = amh;
-  document.getElementById('alertGpon').innerHTML = gF === 'no' ? `<div class="alert alert-warn" style="margin-top:8px;">⚠ Sin facturación activa: factor GPON 0.5</div>` : '';
+  document.getElementById('alertGpon').innerHTML = gF==='no'?'<div class="alert alert-warn" style="margin-top:8px;">⚠ Sin facturación activa: GPON 0.5</div>':'';
 
-  let afh = '';
-  if (aF < 150) afh = `<div class="alert alert-err" style="margin-top:8px;">✗ S/. ${aF.toFixed(0)} < S/.150 → Bono al 25%.</div>`;
-  else if (aF < 220) afh = `<div class="alert alert-warn" style="margin-top:8px;">⚠ S/. ${aF.toFixed(0)} → Bono al 50%. Faltan S/. ${(220 - aF).toFixed(0)} para 100%.</div>`;
-  else afh = `<div class="alert alert-ok" style="margin-top:8px;">✓ S/. ${aF.toFixed(0)} ≥ S/.220 → Bono al 100%.</div>`;
+  let afh='';
+  if (aF<150) afh=`<div class="alert alert-err" style="margin-top:8px;">✗ S/.${aF.toFixed(0)} < S/.150 → Bono 25%.</div>`;
+  else if (aF<220) afh=`<div class="alert alert-warn" style="margin-top:8px;">⚠ S/.${aF.toFixed(0)} → Bono 50%. Faltan S/.${(220-aF).toFixed(0)} para 100%.</div>`;
+  else afh=`<div class="alert alert-ok" style="margin-top:8px;">✓ S/.${aF.toFixed(0)} ≥ S/.220 → Bono 100%.</div>`;
   document.getElementById('alertFija').innerHTML = afh;
 
-  const pct = Math.round(pb * 100);
-  document.getElementById('sbar1').className = 'scale-bar' + (pct >= 25 ? ' active' : '');
-  document.getElementById('sbar2').className = 'scale-bar' + (pct >= 50 ? ' active' : '');
-  document.getElementById('sbar3').className = 'scale-bar' + (pct >= 100 ? ' active' : '');
-  document.getElementById('scalePct').textContent = pct + '%';
+  const pct=Math.round(pb*100);
+  document.getElementById('sbar1').className='scale-bar'+(pct>=25?' active':'');
+  document.getElementById('sbar2').className='scale-bar'+(pct>=50?' active':'');
+  document.getElementById('sbar3').className='scale-bar'+(pct>=100?' active':'');
+  document.getElementById('scalePct').textContent=pct+'%';
 
-  document.getElementById('rComMovil').textContent = fmt(cM);
-  document.getElementById('rComMovilSub').textContent = `${fmt(aM)} × ${ff.toFixed(2)}`;
-  document.getElementById('rComGpon').textContent = fmt(cG);
-  document.getElementById('rComGponSub').textContent = `${fmt(aG)} × ${fGpon.toFixed(1)}`;
-  document.getElementById('rComFija').textContent = fmt(cF);
-  document.getElementById('rComFijaSub').textContent = `${fmt(aF)} × ${rol.factorFija.toFixed(1)}`;
-  document.getElementById('rBasico').textContent = fmt(rol.basico);
-  document.getElementById('rBonoMovil').textContent = fmt(bm);
-  document.getElementById('rBonoMovilSub').textContent = !cumple ? `Req. mín. ${rol.minMovil} líneas` : bmb > 0 ? `${fmt(bmb)} × ${pct}%` : '—';
-  document.getElementById('rBonoGpon').textContent = fmt(bg);
-  document.getElementById('rBonoGponSub').textContent = !cumple ? `Req. mín. ${rol.minMovil} líneas` : aG >= 220 ? 'Access ≥ S/.220' : 'Access < S/.220';
-  document.getElementById('rBonoFija').textContent = fmt(bf);
-  document.getElementById('rBonoFijaSub').textContent = !cumple ? `Req. mín. ${rol.minMovil} líneas` : aF >= 200 ? 'Access ≥ S/.200' : 'Access < S/.200';
-  document.getElementById('rMovilidad').textContent = fmt(rol.movilidad);
-  document.getElementById('rMovilidadSub').textContent = rol.movilidadAdelantada ? 'Adelantada, sin reversión' : 'Con posible reversión';
-  document.getElementById('rTotal').innerHTML = `<span>S/.</span>${Math.round(total).toLocaleString('es-PE')}`;
+  document.getElementById('rComMovil').textContent=fmt(cM);
+  document.getElementById('rComMovilSub').textContent=`${fmt(aM)} × ${ff.toFixed(2)}`;
+  document.getElementById('rComGpon').textContent=fmt(cG);
+  document.getElementById('rComGponSub').textContent=`${fmt(aG)} × ${fGpon.toFixed(1)}`;
+  document.getElementById('rComFija').textContent=fmt(cF);
+  document.getElementById('rComFijaSub').textContent=`${fmt(aF)} × ${rol.factorFija.toFixed(1)}`;
+  document.getElementById('rBasico').textContent=fmt(rol.basico);
+  document.getElementById('rBonoMovil').textContent=fmt(bm);
+  document.getElementById('rBonoMovilSub').textContent=!cumple?`Req. mín. ${rol.minMovil} líneas`:bmb>0?`${fmt(bmb)} × ${pct}%`:'—';
+  document.getElementById('rBonoGpon').textContent=fmt(bg);
+  document.getElementById('rBonoGponSub').textContent=!cumple?`Req. mín. ${rol.minMovil} líneas`:aG>=220?'Access ≥ S/.220':'Access < S/.220';
+  document.getElementById('rBonoFija').textContent=fmt(bf);
+  document.getElementById('rBonoFijaSub').textContent=!cumple?`Req. mín. ${rol.minMovil} líneas`:aF>=200?'Access ≥ S/.200':'Access < S/.200';
+  document.getElementById('rMovilidad').textContent=fmt(rol.movilidad);
+  document.getElementById('rMovilidadSub').textContent=rol.movilidadAdelantada?'Adelantada, sin reversión':'Con posible reversión';
+  document.getElementById('rTotal').innerHTML=`<span>S/.</span>${Math.round(total).toLocaleString('es-PE')}`;
 
   renderBonoTable(rol.bonoMovil, qM);
   renderEscala(rol.tablaFactor, fReal);
