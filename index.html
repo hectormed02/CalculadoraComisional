@@ -92,6 +92,15 @@
   #loadScreen{background:var(--navy);}
   .loader{width:40px;height:40px;border:4px solid rgba(255,255,255,.1);border-top-color:var(--teal);border-radius:50%;animation:spin .8s linear infinite;}
   #appContent{display:none;}
+  
+  /* TABLA DINÁMICA */
+  .plan-row{display:contents;}
+  .plan-row > *{padding:10px;border-bottom:1px solid var(--g100);vertical-align:middle;}
+  .plan-row input, .plan-row select{width:100%;padding:8px;border:1px solid var(--g300);border-radius:6px;font-size:12px;}
+  .plan-row input:focus, .plan-row select:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 2px rgba(0,151,167,.1);}
+  .btn-delete{background:var(--red-lt);color:var(--red);border:none;padding:6px 10px;border-radius:6px;cursor:pointer;font-weight:600;font-size:11px;transition:all .2s;}
+  .btn-delete:hover{background:var(--red);color:white;}
+  button#btnAddMovilPlan:hover{background:var(--teal-dk);}
 </style>
 </head>
 <body>
@@ -126,12 +135,41 @@
 
   <div class="grid">
     <div class="card">
-      <div class="card-header"><div class="card-icon icon-movil">📱</div><div><div class="card-title">Móviles</div></div></div>
+      <div class="card-header"><div class="card-icon icon-movil">📱</div><div><div class="card-title">Móviles – Multiconsulta</div></div></div>
       <div class="card-body">
-        <div class="field"><label>Cantidad de líneas móviles PORTA VOZ</label><input type="number" id="qMoviles" min="0" value="0"></div>
-        <div class="field"><label>Access Móvil (sin IGV)</label><div class="input-prefix"><span>S/.</span><input type="number" id="accessMovil" min="0" value="0" step="0.01"></div></div>
-        <div class="field"><label>Tipo de venta móvil</label><select id="tipoMovil"><option value="porta">PORTA (factor normal)</option><option value="noPortaPack">No PORTA PACK (×0.7)</option><option value="chipNoPack">CHIP NO PORTA / BAM (factor 0.5, no suma)</option></select></div>
+        <div style="overflow-x:auto;margin-bottom:16px;">
+          <table style="width:100%;border-collapse:collapse;font-size:12px;">
+            <thead>
+              <tr style="background:var(--navy-lt);border-bottom:2px solid var(--teal);">
+                <th style="padding:10px;text-align:left;font-weight:600;color:var(--navy);">Plan</th>
+                <th style="padding:10px;text-align:center;font-weight:600;color:var(--navy);">Cantidad Líneas</th>
+                <th style="padding:10px;text-align:center;font-weight:600;color:var(--navy);">Renta Básica</th>
+                <th style="padding:10px;text-align:center;font-weight:600;color:var(--navy);">Descuento %</th>
+                <th style="padding:10px;text-align:center;font-weight:600;color:var(--navy);">Access Real</th>
+                <th style="padding:10px;text-align:center;font-weight:600;color:var(--navy);">Tipo Venta</th>
+                <th style="padding:10px;text-align:center;font-weight:600;color:var(--navy);">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="movilesPlanesTable">
+            </tbody>
+          </table>
+        </div>
+        <button id="btnAddMovilPlan" style="width:100%;padding:10px;background:var(--teal);color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;margin-bottom:16px;">+ Agregar Plan Móvil</button>
+        
         <hr class="divider">
+        <div style="background:var(--g50);padding:12px;border-radius:8px;margin-bottom:16px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:12px;">
+            <div>
+              <div style="color:var(--g500);font-weight:600;margin-bottom:4px;">Total Líneas</div>
+              <div style="font-size:18px;font-weight:700;color:var(--navy);" id="totalLineasMovil">0</div>
+            </div>
+            <div>
+              <div style="color:var(--g500);font-weight:600;margin-bottom:4px;">Total Access</div>
+              <div style="font-size:18px;font-weight:700;color:var(--navy);" id="totalAccessMovil">S/. 0</div>
+            </div>
+          </div>
+        </div>
+
         <div class="factor-display"><div><div class="factor-label">Factor Facturación MOV+GPON</div><div class="factor-range" id="factorRange">—</div></div><div class="factor-value" id="factorMovilVal">0.0</div></div>
         <div style="margin-top:14px;"><div class="factor-label" style="margin-bottom:8px;">Tramo actual</div><div id="factorEscala"></div></div>
         <div id="alertMovil"></div>
@@ -211,6 +249,8 @@ class ComisionesCalculator {
     this.currentRole = '';
     this.calcTimeout = null;
     this.DOM = {}; // Cache de elementos
+    this.movilesPlan = []; // Array para planes móviles
+    this.planIdCounter = 0; // Contador de IDs únicos
     this.initializeDOM();
   }
 
@@ -256,6 +296,12 @@ class ComisionesCalculator {
       rMovilidadSub: document.getElementById('rMovilidadSub'),
       rTotal: document.getElementById('rTotal'),
       
+      // Tabla móviles
+      movilesPlanesTable: document.getElementById('movilesPlanesTable'),
+      btnAddMovilPlan: document.getElementById('btnAddMovilPlan'),
+      totalLineasMovil: document.getElementById('totalLineasMovil'),
+      totalAccessMovil: document.getElementById('totalAccessMovil'),
+      
       // Scale bars
       sbar1: document.getElementById('sbar1'),
       sbar2: document.getElementById('sbar2'),
@@ -276,10 +322,13 @@ class ComisionesCalculator {
     const selectHandler = () => this.recalc();
 
     [this.DOM.qMoviles, this.DOM.accessMovil, this.DOM.accessGpon, this.DOM.accessFija]
-      .forEach(el => el.addEventListener('input', inputHandler));
+      .forEach(el => el?.addEventListener('input', inputHandler));
     
     [this.DOM.tipoMovil, this.DOM.gponFactura, this.DOM.roleSelect]
-      .forEach(el => el.addEventListener('change', selectHandler));
+      .forEach(el => el?.addEventListener('change', selectHandler));
+    
+    // Botón agregar plan móvil
+    this.DOM.btnAddMovilPlan.addEventListener('click', () => this.addMovilPlan());
   }
 
   // ── Debounce para evitar cálculos innecesarios ──
@@ -487,6 +536,9 @@ class ComisionesCalculator {
     });
 
     this.currentRole = roles[0];
+    
+    // Inicializar tabla móviles con un plan por defecto
+    this.addMovilPlan();
   }
 
   // ── Obtener factor ──
@@ -590,17 +642,12 @@ class ComisionesCalculator {
     this.DOM.scalePct.textContent = pct + '%';
   }
 
-  // ── Renderizar alertas ──
-  renderAlerts(qM, cumple, tM, fb, fReal, aG, gF, aF, rol) {
+  // ── Renderizar alertas (versión multiconsulta) ──
+  renderAlertsMulticonsulta(qM, cumple, fb, fReal, aG, gF, aF, rol) {
     // Alert Móvil
     let amh = '';
     if (!cumple && qM > 0) {
       amh = `<div class="alert alert-err">✗ ${qM} líneas < ${rol.minMovil} mínimo. Sin bono. Faltan ${rol.minMovil - qM}.</div>`;
-    } else if (tM === 'noPortaPack') {
-      const ff = fb * 0.7;
-      amh = `<div class="alert alert-warn">⚠ Factor ×0.7 No PORTA PACK (${fb.toFixed(1)} → ${ff.toFixed(2)})</div>`;
-    } else if (tM === 'chipNoPack') {
-      amh = `<div class="alert alert-warn">⚠ CHIP NO PORTA/BAM: factor 0.5, no suma a fact. real.</div>`;
     } else if (fb === 0) {
       amh = `<div class="alert alert-err">✗ Fact. real S/.${Math.round(fReal).toLocaleString('es-PE')} bajo umbral. Factor=0.</div>`;
     } else if (fb >= rol.tablaFactor[rol.tablaFactor.length - 1]?.factor) {
@@ -629,24 +676,26 @@ class ComisionesCalculator {
     const rol = this.ROLES[this.currentRole];
     if (!rol) return;
 
-    const qM = parseFloat(this.DOM.qMoviles.value) || 0;
-    const aM = parseFloat(this.DOM.accessMovil.value) || 0;
+    // Obtener totales de la tabla móviles
+    const { totalLineas: qM, totalAccess: aM } = this.getMovilesTotals();
+    
     const aG = parseFloat(this.DOM.accessGpon.value) || 0;
     const aF = parseFloat(this.DOM.accessFija.value) || 0;
-    const tM = this.DOM.tipoMovil.value;
     const gF = this.DOM.gponFactura.value;
 
     this.DOM.badgeRole.textContent = rol.name;
 
+    // Actualizar totales en la UI
+    this.DOM.totalLineasMovil.textContent = qM.toLocaleString('es-PE');
+    this.DOM.totalAccessMovil.textContent = this.format(aM);
+
     const fGpon = gF === 'si' ? 1.0 : 0.5;
-    const fReal = tM === 'chipNoPack' ? aG : aM + aG;
+    const fReal = aM + aG;
     const rf = this.getFactor(rol.tablaFactor, fReal);
-    let fb = rf.factor, ff = fb;
+    const fb = rf.factor;
+    const ff = fb; // Para multiconsulta, no aplicar descuentos de tipo de venta
 
-    if (tM === 'noPortaPack') ff = fb * 0.7;
-    if (tM === 'chipNoPack') ff = 0.5;
-
-    const cM = tM !== 'chipNoPack' ? aM * ff : aM * 0.5;
+    const cM = aM * ff;
     const cG = aG * fGpon;
     const cF = aF * rol.factorFija;
     const pb = this.getPctBono(aF);
@@ -670,7 +719,7 @@ class ComisionesCalculator {
     this.DOM.factorRange.textContent = `Rango: ${rs} (Fact. real: S/. ${Math.round(fReal).toLocaleString('es-PE')})`;
 
     // Renderizar componentes
-    this.renderAlerts(qM, cumple, tM, fb, fReal, aG, gF, aF, rol);
+    this.renderAlertsMulticonsulta(qM, cumple, fb, fReal, aG, gF, aF, rol);
     this.updateScaleBars(Math.round(pb * 100));
     this.renderBonoTable(rol.bonoMovil, qM);
     this.renderEscala(rol.tablaFactor, fReal);
@@ -695,11 +744,92 @@ class ComisionesCalculator {
     this.DOM.rTotal.innerHTML = `<span>S/.</span>${Math.round(total).toLocaleString('es-PE')}`;
   }
 
-  // ── Cambiar rol ──
-  setRole(role) {
-    this.currentRole = role;
-    this.recalc();
+  // ── TABLA DINÁMICA PLANES MÓVILES ──
+  
+  addMovilPlan() {
+    const plan = {
+      id: this.planIdCounter++,
+      nombre: '',
+      cantidad: 0,
+      rentaBasica: 0,
+      descuento: 0,
+      accessReal: 0,
+      tipoVenta: 'porta'
+    };
+    this.movilesPlan.push(plan);
+    this.renderMovilesPlanesTable();
   }
+
+  deleteMovilPlan(id) {
+    this.movilesPlan = this.movilesPlan.filter(p => p.id !== id);
+    this.renderMovilesPlanesTable();
+  }
+
+  updateMovilPlan(id, field, value) {
+    const plan = this.movilesPlan.find(p => p.id === id);
+    if (plan) {
+      plan[field] = field === 'cantidad' || field === 'descuento' ? parseInt(value) || 0 : parseFloat(value) || 0;
+      if (field === 'tipoVenta' || field === 'nombre') plan[field] = value;
+      this.debounceCalc();
+    }
+  }
+
+  renderMovilesPlanesTable() {
+    this.DOM.movilesPlanesTable.innerHTML = '';
+    
+    if (this.movilesPlan.length === 0) {
+      this.DOM.movilesPlanesTable.innerHTML = `
+        <tr style="height:40px;">
+          <td colspan="7" style="text-align:center;color:var(--g500);font-size:12px;">
+            No hay planes agregados. Haz clic en "+ Agregar Plan Móvil"
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    this.movilesPlan.forEach(plan => {
+      const row = document.createElement('tr');
+      row.className = 'plan-row';
+      row.innerHTML = `
+        <td><input type="text" placeholder="Ej: Plan X 50GB" value="${plan.nombre}" onchange="calculator.updateMovilPlan(${plan.id}, 'nombre', this.value)"></td>
+        <td><input type="number" min="0" value="${plan.cantidad}" onchange="calculator.updateMovilPlan(${plan.id}, 'cantidad', this.value)"></td>
+        <td><input type="number" min="0" step="0.01" value="${plan.rentaBasica}" placeholder="Renta básica" onchange="calculator.updateMovilPlan(${plan.id}, 'rentaBasica', this.value)"></td>
+        <td><input type="number" min="0" max="100" value="${plan.descuento}" placeholder="%"  onchange="calculator.updateMovilPlan(${plan.id}, 'descuento', this.value)"></td>
+        <td><input type="number" min="0" step="0.01" value="${plan.accessReal}" placeholder="Access real" onchange="calculator.updateMovilPlan(${plan.id}, 'accessReal', this.value)"></td>
+        <td>
+          <select onchange="calculator.updateMovilPlan(${plan.id}, 'tipoVenta', this.value)">
+            <option value="porta" ${plan.tipoVenta === 'porta' ? 'selected' : ''}>PORTA</option>
+            <option value="noPortaPack" ${plan.tipoVenta === 'noPortaPack' ? 'selected' : ''}>No PORTA (×0.7)</option>
+            <option value="chipNoPack" ${plan.tipoVenta === 'chipNoPack' ? 'selected' : ''}>CHIP/BAM</option>
+          </select>
+        </td>
+        <td><button class="btn-delete" onclick="calculator.deleteMovilPlan(${plan.id})">Eliminar</button></td>
+      `;
+      this.DOM.movilesPlanesTable.appendChild(row);
+    });
+  }
+
+  getMovilesTotals() {
+    let totalLineas = 0;
+    let totalAccess = 0;
+    let totalRenta = 0;
+    let totalDescuento = 0;
+
+    this.movilesPlan.forEach(plan => {
+      totalLineas += plan.cantidad;
+      totalAccess += plan.accessReal;
+      totalRenta += plan.rentaBasica;
+      const descuentoMonto = (plan.rentaBasica * plan.descuento) / 100;
+      totalDescuento += descuentoMonto;
+    });
+
+    return { totalLineas, totalAccess, totalRenta, totalDescuento };
+  }
+
+  // ── FIN TABLA DINÁMICA ──
+
+
 
   // ── Mostrar error ──
   showError(message) {
