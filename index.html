@@ -156,10 +156,10 @@
           <table style="width:100%;border-collapse:collapse;font-size:12px;">
             <thead>
               <tr style="background:var(--navy-lt);border-bottom:2px solid var(--teal);">
-                <th style="padding:10px;text-align:left;font-weight:600;color:var(--navy);">Plan</th>
-                <th style="padding:10px;text-align:center;font-weight:600;color:var(--navy);">Cantidad Líneas</th>
-                <th style="padding:10px;text-align:center;font-weight:600;color:var(--navy);">Renta Básica</th>
-                <th style="padding:10px;text-align:center;font-weight:600;color:var(--navy);">Descuento %</th>
+                <th style="padding:10px;text-align:left;font-weight:600;color:var(--navy);">Seleccionar Plan</th>
+                <th style="padding:10px;text-align:center;font-weight:600;color:var(--navy);">Qty Líneas</th>
+                <th style="padding:10px;text-align:center;font-weight:600;color:var(--navy);">Renta Base</th>
+                <th style="padding:10px;text-align:center;font-weight:600;color:var(--navy);">Dscto %</th>
                 <th style="padding:10px;text-align:center;font-weight:600;color:var(--navy);">Access Real</th>
                 <th style="padding:10px;text-align:center;font-weight:600;color:var(--navy);">Tipo Venta</th>
                 <th style="padding:10px;text-align:center;font-weight:600;color:var(--navy);">Acción</th>
@@ -266,6 +266,23 @@ class ComisionesCalculator {
     this.DOM = {}; // Cache de elementos
     this.movilesPlan = []; // Array para planes móviles
     this.planIdCounter = 0; // Contador de IDs únicos
+    
+    // Planes predefinidos
+    this.PLANES = [
+      { id: 1, nombre: 'Plan 31.90', rentaBasica: 31.90 },
+      { id: 2, nombre: 'Plan 33.90', rentaBasica: 33.90 },
+      { id: 3, nombre: 'Plan 42.90', rentaBasica: 42.90 },
+      { id: 4, nombre: 'Plan 44.90', rentaBasica: 44.90 },
+      { id: 5, nombre: 'Plan 59.90', rentaBasica: 59.90 },
+      { id: 6, nombre: 'Plan 69.90', rentaBasica: 69.90 },
+      { id: 7, nombre: 'Plan 74.90', rentaBasica: 74.90 },
+      { id: 8, nombre: 'Plan 79.90', rentaBasica: 79.90 },
+      { id: 9, nombre: 'Plan 85.90', rentaBasica: 85.90 },
+      { id: 10, nombre: 'Plan 99.90', rentaBasica: 99.90 },
+      { id: 11, nombre: 'Plan 105.90', rentaBasica: 105.90 },
+      { id: 12, nombre: 'Plan 159.90', rentaBasica: 159.90 }
+    ];
+    
     this.initializeDOM();
   }
 
@@ -764,11 +781,9 @@ class ComisionesCalculator {
   addMovilPlan() {
     const plan = {
       id: this.planIdCounter++,
-      nombre: '',
+      planId: 1, // ID del plan predefinido (por defecto Plan 31.90)
       cantidad: 0,
-      rentaBasica: 0,
       descuento: 0,
-      accessReal: 0,
       tipoVenta: 'porta'
     };
     this.movilesPlan.push(plan);
@@ -783,8 +798,13 @@ class ComisionesCalculator {
   updateMovilPlan(id, field, value) {
     const plan = this.movilesPlan.find(p => p.id === id);
     if (plan) {
-      plan[field] = field === 'cantidad' || field === 'descuento' ? parseInt(value) || 0 : parseFloat(value) || 0;
-      if (field === 'tipoVenta' || field === 'nombre') plan[field] = value;
+      if (field === 'planId') {
+        plan.planId = parseInt(value);
+      } else if (field === 'cantidad' || field === 'descuento') {
+        plan[field] = parseInt(value) || 0;
+      } else if (field === 'tipoVenta') {
+        plan.tipoVenta = value;
+      }
       this.debounceCalc();
     }
   }
@@ -795,7 +815,7 @@ class ComisionesCalculator {
     if (this.movilesPlan.length === 0) {
       this.DOM.movilesPlanesTable.innerHTML = `
         <tr style="height:40px;">
-          <td colspan="7" style="text-align:center;color:var(--g500);font-size:12px;">
+          <td colspan="6" style="text-align:center;color:var(--g500);font-size:12px;">
             No hay planes agregados. Haz clic en "+ Agregar Plan Móvil"
           </td>
         </tr>
@@ -804,14 +824,28 @@ class ComisionesCalculator {
     }
 
     this.movilesPlan.forEach(plan => {
+      const planSeleccionado = this.PLANES.find(p => p.id === plan.planId);
+      const rentaBasica = planSeleccionado ? planSeleccionado.rentaBasica : 0;
+      const accessReal = rentaBasica - (rentaBasica * plan.descuento / 100);
+      
+      // Crear opciones del dropdown
+      const opcionesPlanes = this.PLANES.map(p => 
+        `<option value="${p.id}" ${p.id === plan.planId ? 'selected' : ''}>${p.nombre}</option>`
+      ).join('');
+      
       const row = document.createElement('tr');
       row.className = 'plan-row';
       row.innerHTML = `
-        <td><input type="text" placeholder="Ej: Plan X 50GB" value="${plan.nombre}" onchange="calculator.updateMovilPlan(${plan.id}, 'nombre', this.value)"></td>
+        <td>
+          <select onchange="calculator.updateMovilPlan(${plan.id}, 'planId', this.value)">
+            <option value="">Seleccionar plan...</option>
+            ${opcionesPlanes}
+          </select>
+        </td>
         <td><input type="number" min="0" value="${plan.cantidad}" onchange="calculator.updateMovilPlan(${plan.id}, 'cantidad', this.value)"></td>
-        <td><input type="number" min="0" step="0.01" value="${plan.rentaBasica}" placeholder="Renta básica" onchange="calculator.updateMovilPlan(${plan.id}, 'rentaBasica', this.value)"></td>
-        <td><input type="number" min="0" max="100" value="${plan.descuento}" placeholder="%"  onchange="calculator.updateMovilPlan(${plan.id}, 'descuento', this.value)"></td>
-        <td><input type="number" min="0" step="0.01" value="${plan.accessReal}" placeholder="Access real" onchange="calculator.updateMovilPlan(${plan.id}, 'accessReal', this.value)"></td>
+        <td><input type="number" min="0" step="0.01" value="${rentaBasica}" placeholder="Renta" readonly style="background:var(--g100);color:var(--g500);cursor:not-allowed;"></td>
+        <td><input type="number" min="0" max="100" value="${plan.descuento}" placeholder="%" onchange="calculator.updateMovilPlan(${plan.id}, 'descuento', this.value)"></td>
+        <td><input type="number" min="0" step="0.01" value="${accessReal}" placeholder="Access" readonly style="background:var(--g100);color:var(--g500);cursor:not-allowed;"></td>
         <td>
           <select onchange="calculator.updateMovilPlan(${plan.id}, 'tipoVenta', this.value)">
             <option value="porta" ${plan.tipoVenta === 'porta' ? 'selected' : ''}>PORTA</option>
@@ -828,18 +862,18 @@ class ComisionesCalculator {
   getMovilesTotals() {
     let totalLineas = 0;
     let totalAccess = 0;
-    let totalRenta = 0;
-    let totalDescuento = 0;
 
     this.movilesPlan.forEach(plan => {
-      totalLineas += plan.cantidad;
-      totalAccess += plan.accessReal;
-      totalRenta += plan.rentaBasica;
-      const descuentoMonto = (plan.rentaBasica * plan.descuento) / 100;
-      totalDescuento += descuentoMonto;
+      const planSeleccionado = this.PLANES.find(p => p.id === plan.planId);
+      if (planSeleccionado) {
+        totalLineas += plan.cantidad;
+        const rentaBasica = planSeleccionado.rentaBasica;
+        const accessReal = rentaBasica - (rentaBasica * plan.descuento / 100);
+        totalAccess += accessReal;
+      }
     });
 
-    return { totalLineas, totalAccess, totalRenta, totalDescuento };
+    return { totalLineas, totalAccess };
   }
 
   // ── FIN TABLA DINÁMICA ──
